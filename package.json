@@ -42,6 +42,7 @@
 	"browserslist": "> 0.5%, last 4 versions, not ie <= 11, not ie_mob <= 11",
 	"dependencies": {
 		"d3-geo-projection": "^4.0.0",
+		"flubber": "^0.4.2",
 		"topojson-client": "^3.1.0"
 	}
 }

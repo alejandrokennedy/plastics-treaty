@@ -1,8 +1,4 @@
 <!--
-  margin
-  ordinal scale
-  scale band
-  draw rects
   derive unitPath
   add unitPath to countries object
   sort units (by pop)
@@ -13,10 +9,6 @@
   base margins on w&h
 -->
 <script lang="ts">
-	import { getContext } from "svelte";
-	import Scrolly from "$components/helpers/Scrolly.svelte";
-	import worldCountries from "$data/worldCountries.json";
-	import countryData from "$data/populationAffiliation.csv";
 	import {
 		geoPath,
 		scaleOrdinal,
@@ -26,20 +18,28 @@
 		range,
 		color as d3color
 	} from "d3";
+	import { getContext } from "svelte";
+	import { browser } from "$app/environment";
+	import Scrolly from "$components/helpers/Scrolly.svelte";
+	import worldCountries from "$data/worldCountries.json";
+	import countryData from "$data/populationAffiliation.csv";
 	import { geoWinkel3 } from "d3-geo-projection";
 	import { feature, mesh } from "topojson-client";
+	import * as flubber from "flubber";
+	let toRect;
+	if (browser) {
+		({ toRect } = flubber);
+	}
 
 	countryData.forEach((d) => {
 		((d.LocationId = +d.LocationId),
 			(d.Value = +d.Value),
 			(d.affId = +d.affId));
 	});
-	$inspect("countryData", countryData);
+
 	const cDataFiltered = countryData.filter(
 		(d) => d.Affiliation || d.euExplicit
 	);
-	$inspect("cDataFiltered", cDataFiltered);
-	// $inspect("cDataFiltered.length", cDataFiltered.length);
 
 	const chapters = getContext("chapters");
 
@@ -76,10 +76,6 @@
 		affiliationRollup.get("hac") + euExplicitRollup.get("FALSE")
 	);
 
-	$inspect("affiliationRollup", affiliationRollup);
-	$inspect("euExplicitRollup", euExplicitRollup);
-	$inspect("yMax", yMax);
-
 	// for unit chart
 	const margin = { top: 20, left: 300, bottom: 20, right: 300 };
 	let xScale = $derived(
@@ -96,18 +92,34 @@
 			.paddingInner(0.2)
 	);
 
+	const hacColor = "orange",
+		lmgColor = "green";
+	const alignedColor = d3color(hacColor).darker(0.7).formatHex();
+
+	const color = scaleOrdinal()
+		.domain(["hac", "lmg", "hacAligned"])
+		.range([hacColor, lmgColor, alignedColor]);
+
 	// Enhance countries with affiliation data and computed fill color
 	let countries = $derived(
 		geojson?.features.map((country) => {
 			const d = countryIndex.get(country.id) || null;
 			const affiliation = d?.Affiliation || "";
 			const euExplicit = d?.euExplicit || "";
-
-			// console.log("---");
-			// console.log("d", d);
+			const affId = d?.affId || "";
+			const path1 = pathGenerator(country);
+			const interpolator = browser
+				? flubber.toRect(
+						path1,
+						xScale(affiliation) || xScale("hac"),
+						yScale(affId),
+						xScale.bandwidth(),
+						yScale.bandwidth()
+					)
+				: path1;
 
 			let fill = "whitesmoke"; // default color
-			// if (step > 0 && affiliation === "hac") {
+
 			if (step > 0 && affiliation === "hac") {
 				fill = color("hac");
 			}
@@ -117,31 +129,27 @@
 			if (step > 2 && euExplicit === "FALSE") {
 				fill = color("hacAligned");
 			}
+			// if (step > 3)
+			if (step > 3) {
+				console.log("interpolator", interpolator);
+			}
 
 			return {
 				...country,
-				path: pathGenerator(country),
+				path1,
+				path2: interpolator,
 				affiliation,
 				fill
 			};
 		}) ?? []
 	);
-
-	const hacColor = "orange",
-		lmgColor = "green";
-	const alignedColor = d3color(hacColor).darker(0.7).formatHex();
-	const color = scaleOrdinal()
-		.domain(["hac", "lmg", "hacAligned"])
-		.range([hacColor, lmgColor, alignedColor]);
 </script>
 
 <section id="plastics-scrolly">
 	<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 		<svg id="svg" {width} {height}>
-			<g id="units">
+			<!-- <g id="units">
 				{#each cDataFiltered as { Affiliation, affId }, i}
-					{console.log(i)}
-					{console.log("yScale(affId)", yScale(affId))}
 					<rect
 						x={xScale(Affiliation) || xScale("hac")}
 						y={yScale(affId)}
@@ -150,10 +158,10 @@
 						fill={Affiliation ? color(Affiliation) : color("hacAligned")}
 					></rect>
 				{/each}
-			</g>
+			</g> -->
 			<g id="country-group">
-				{#each countries as { path, fill }}
-					<path d={path} {fill}></path>
+				{#each countries as { path1, path2Coords, fill }}
+					<path d={path1} {fill}></path>
 				{/each}
 			</g>
 		</svg>
