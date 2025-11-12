@@ -1,35 +1,81 @@
 <!--
-  derive unitPath
-  add unitPath to countries object
   sort units (by pop)
+  make sure only needed countries are added to geoOneTen (adjust compositing)
+  make json from composit (in other file), import json
   position/tweak unit chart
   axes
     x: affiliation
     y: countries? flags?
   base margins on w&h
+  add typescript, fix errors
+  install types
 -->
+
 <script lang="ts">
 	import {
 		geoPath,
 		scaleOrdinal,
 		scaleBand,
+		scaleLinear,
 		index,
 		rollup,
 		range,
+		csv,
+		sum,
 		color as d3color
 	} from "d3";
-	import { getContext } from "svelte";
-	import { browser } from "$app/environment";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
-	import worldCountries from "$data/worldCountries.json";
+	import { getContext, onMount } from "svelte";
+	import { browser } from "$app/environment";
+	import { tweened } from "svelte/motion";
+	import worldOneTen from "$data/worldOneTen.json";
+	import worldFifty from "$data/worldFifty.json";
+	import worldTen from "$data/worldTen.json";
 	import countryData from "$data/populationAffiliation.csv";
 	import { geoWinkel3 } from "d3-geo-projection";
-	import { feature, mesh } from "topojson-client";
+	import { feature } from "topojson-client";
 	import * as flubber from "flubber";
-	let toRect;
-	if (browser) {
-		({ toRect } = flubber);
-	}
+
+	const chapters = getContext("chapters");
+	// let chapters = $state([]);
+
+	// let loading = $state(true);
+	// let error = $state<string | null>(null);
+
+	// const chaptersUrl =
+	// 	"https://docs.google.com/spreadsheets/d/e/2PACX-1vRkBD_sIXbVLDPBA2y5mlJviA-Xj2uDa6ZTGZQvr7By3Bf-H0uFpCGWh0RvglX-XtodPkQgQmcizFLC/pub?gid=569490652&single=true&output=csv";
+
+	// onMount(() => {
+	// 	const controller = new AbortController();
+
+	// 	const fetchData = async (url: string) => {
+	// 		loading = true;
+	// 		error = null;
+
+	// 		try {
+	// 			const result = await csv(url, {
+	// 				signal: controller.signal
+	// 			});
+	// 			chapters = result;
+	// 		} catch (err) {
+	// 			if (err instanceof Error && err.name === "AbortError") {
+	// 				return; //Component unmounted
+	// 			}
+	// 			error = err instanceof Error ? err.message : "Failed to fetch data";
+	// 			console.error(`error fetching data: ${err}`);
+	// 		} finally {
+	// 			loading = false;
+	// 		}
+	// 	};
+
+	// 	fetchData(chaptersUrl);
+
+	// 	return () => {
+	// 		controller.abort();
+	// 	};
+	// });
+
+	// $inspect("chapters", chapters);
 
 	countryData.forEach((d) => {
 		((d.LocationId = +d.LocationId),
@@ -37,25 +83,75 @@
 			(d.affId = +d.affId));
 	});
 
-	const cDataFiltered = countryData.filter(
-		(d) => d.Affiliation || d.euExplicit
+	const cDataFiltered = countryData.filter((d) => d.Affiliation);
+	const cDataSuperFiltered = cDataFiltered.filter(
+		(d) => d.Affiliation === "hac" || d.Affiliation === "eu"
 	);
-
-	const chapters = getContext("chapters");
 
 	let step = $state(null);
 	let width = $state(600);
 	let height = $state(400);
-	// Convert geometry IDs from strings to numbers
-	const processedGeo = feature(
-		worldCountries,
-		worldCountries.objects.countries
-	);
-	processedGeo.features.forEach((f) => {
-		f.id = +f.id; // Convert string IDs like "004" to numbers like 4
+
+	// Tweened progress (0 to 1) for smooth morphing animation
+	const progress = tweened(0, {
+		duration: 5800, // Animation duration in milliseconds
+		easing: (t) => t * t * (3 - 2 * t) // Smoothstep easing
 	});
+
+	// Update progress when step changes
+	$effect(() => {
+		if (step === null || step === undefined || step < 4) {
+			progress.set(0);
+		} else if (step === 4) {
+			progress.set(1);
+		} else {
+			progress.set(1);
+		}
+	});
+
+	// Multi-resolution compositing: combine features from all three resolutions
+	// Start with 110m (smallest file), then add missing from 50m, then 10m
+	const geoOneTen = feature(worldOneTen, worldOneTen.objects.countries);
+	const geoFifty = feature(worldFifty, worldFifty.objects.countries);
+	const geoTen = feature(worldTen, worldTen.objects.countries);
+
+	// Convert all IDs from strings to numbers
+	[geoOneTen, geoFifty, geoTen].forEach((geo) => {
+		geo.features.forEach((f) => {
+			f.id = +f.id;
+		});
+	});
+
+	// Create index of existing IDs from 110m resolution
+	const existingIds = new Set(geoOneTen.features.map((f) => f.id));
+
+	// Add missing features from 50m resolution
+	geoFifty.features.forEach((feature) => {
+		if (!existingIds.has(feature.id)) {
+			geoOneTen.features.push(feature);
+			existingIds.add(feature.id);
+		}
+	});
+
+	// Add missing features from 10m resolution
+	geoTen.features.forEach((feature) => {
+		if (!existingIds.has(feature.id)) {
+			geoOneTen.features.push(feature);
+			existingIds.add(feature.id);
+		}
+	});
+
+	const processedGeo = geoOneTen;
+	// console.log(
+	// 	`Total countries after compositing: ${processedGeo.features.length}`
+	// );
+
+	// console.log("processedGeo", processedGeo);
+
 	let geojson = $state(processedGeo);
-	let projection = $derived(geoWinkel3().fitSize([width, height], geojson));
+	let projection = $derived(
+		geoWinkel3().rotate([-10.2, 0]).fitSize([width, height], geojson)
+	);
 	let pathGenerator = $derived(geoPath(projection));
 	let countryIndex = $derived(index(countryData, (d) => d.LocationId));
 	let affiliationRollup = $derived(
@@ -65,18 +161,9 @@
 			(d) => d.Affiliation
 		)
 	);
-	let euExplicitRollup = $derived(
-		rollup(
-			countryData,
-			(v) => v.length,
-			(d) => d.euExplicit
-		)
-	);
-	let yMax = $derived(
-		affiliationRollup.get("hac") + euExplicitRollup.get("FALSE")
-	);
 
-	// for unit chart
+	// console.warn("---");
+
 	const margin = { top: 20, left: 300, bottom: 20, right: 300 };
 	let xScale = $derived(
 		scaleBand()
@@ -85,6 +172,9 @@
 			.paddingInner(0.03)
 			.paddingOuter(1.5)
 	);
+	let yMax = $derived(
+		affiliationRollup.get("hac") + affiliationRollup.get("eu")
+	);
 	let yScale = $derived(
 		scaleBand()
 			.domain(range(0, yMax))
@@ -92,13 +182,56 @@
 			.paddingInner(0.2)
 	);
 
+	// stacks
+	const makeStack = (data, val, name) => {
+		const total = sum(data, (d) => d[val]);
+		let value = 0;
+		return {
+			stack: index(
+				data.map((d) => ({
+					...d,
+					name: d[name],
+					value: d[val] / total,
+					startValue: value / total,
+					endValue: (value += d[val]) / total
+				})),
+				(d) => d.LocationId
+			),
+			total: total
+		};
+	};
+
+	const hacStack = makeStack(
+		countryData.filter(
+			(d) => d.Affiliation === "hac" || d.Affiliation === "eu"
+		),
+		"Value",
+		"LocationId"
+	);
+
+	const lmgStack = makeStack(
+		countryData.filter((d) => d.Affiliation === "lmg"),
+		"Value",
+		"LocationId"
+	);
+
+	console.log("hacStack.stack", hacStack.stack);
+	console.log("hacStack.stack.get(566)", hacStack.stack.get(566));
+	// console.log("lmgStack", lmgStack);
+
+	const yStackScale = $derived(
+		scaleLinear()
+			.domain([0, 1])
+			.range([height - margin.bottom, margin.top])
+	);
+
 	const hacColor = "orange",
-		lmgColor = "green";
-	const alignedColor = d3color(hacColor).darker(0.7).formatHex();
+		lmgColor = "green",
+		euColor = d3color(hacColor).darker(0.7).formatHex();
 
 	const color = scaleOrdinal()
-		.domain(["hac", "lmg", "hacAligned"])
-		.range([hacColor, lmgColor, alignedColor]);
+		.domain(["hac", "lmg", "eu"])
+		.range([hacColor, lmgColor, euColor]);
 
 	// Enhance countries with affiliation data and computed fill color
 	let countries = $derived(
@@ -106,17 +239,63 @@
 			const d = countryIndex.get(country.id) || null;
 			const affiliation = d?.Affiliation || "";
 			const euExplicit = d?.euExplicit || "";
-			const affId = d?.affId || "";
+			const affId = d?.affId ?? null;
 			const path1 = pathGenerator(country);
-			const interpolator = browser
-				? flubber.toRect(
-						path1,
-						xScale(affiliation) || xScale("hac"),
-						yScale(affId),
-						xScale.bandwidth(),
-						yScale.bandwidth()
-					)
-				: path1;
+
+			let currentPath;
+
+			if (!affiliation) {
+				currentPath = path1;
+			} else {
+				// Validate all rectangle parameters before creating interpolator
+				const x = xScale(affiliation) || xScale("hac");
+				const y = yScale(affId);
+				const width = xScale.bandwidth();
+				const height = yScale.bandwidth();
+				// Handle MultiPolygons using flubber.combine() to morph ALL pieces to rectangle
+				if (country.geometry.type === "MultiPolygon" && browser) {
+					// Extract all polygons from the MultiPolygon (not just the largest)
+					const polygons = country.geometry.coordinates;
+					// Convert each polygon piece to an SVG path string
+					const polygonPaths = polygons.map((polygonCoords) => {
+						const polygonFeature = {
+							type: "Feature",
+							geometry: {
+								type: "Polygon",
+								coordinates: polygonCoords
+							}
+						};
+						return pathGenerator(polygonFeature);
+					});
+					// Create the target rectangle as an SVG path string
+					const rectPath = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
+
+					try {
+						// Use flubber.combine to morph all polygon pieces into one rectangle
+						const interpolator = flubber.combine(
+							polygonPaths, // FROM: all pieces of the country (e.g., Russia's islands + mainland)
+							rectPath, // TO: one rectangle
+							{ single: true } // Return one combined path string
+						);
+						currentPath = interpolator($progress);
+					} catch (error) {
+						// console.warn("Failed to combine MultiPolygon");
+						// console.warn(
+						// 	`Failed to combine MultiPolygon for ${d?.Location}:`,
+						// 	error
+						// );
+						currentPath = path1;
+					}
+				} else {
+					// Single polygon: use toRect to morph directly to rectangle
+					const interpolator = browser
+						? flubber.toRect(path1, x, y, width, height)
+						: null;
+
+					currentPath =
+						browser && interpolator ? interpolator($progress) : path1;
+				}
+			}
 
 			let fill = "whitesmoke"; // default color
 
@@ -126,20 +305,17 @@
 			if (step > 1 && affiliation === "lmg") {
 				fill = color("lmg");
 			}
-			if (step > 2 && euExplicit === "FALSE") {
-				fill = color("hacAligned");
-			}
-			// if (step > 3)
-			if (step > 3) {
-				console.log("interpolator", interpolator);
+			if (step > 2 && euExplicit === "no") {
+				fill = color("eu");
 			}
 
 			return {
 				...country,
 				path1,
-				path2: interpolator,
+				currentPath,
 				affiliation,
-				fill
+				fill,
+				Location: d?.Location
 			};
 		}) ?? []
 	);
@@ -148,20 +324,52 @@
 <section id="plastics-scrolly">
 	<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 		<svg id="svg" {width} {height}>
+			<g id="stack">
+				{#each cDataSuperFiltered as { Affiliation, affId, Location, LocationId }, i}
+					<!-- {console.log("---")}
+					{console.log(yStackScale(hacStack.stack.get(LocationId).startValue))}
+					{console.log(hacStack.stack.get(LocationId).startValue)} -->
+					<rect
+						x={xScale(Affiliation) || xScale("hac")}
+						y={yStackScale(hacStack.stack.get(LocationId).endValue)}
+						width={xScale.bandwidth()}
+						height={yStackScale(hacStack.stack.get(LocationId).startValue) -
+							yStackScale(hacStack.stack.get(LocationId).endValue)}
+						fill={Affiliation ? color(Affiliation) : color("eu")}
+					>
+						<title>{Location}</title>
+					</rect>
+				{/each}
+			</g>
 			<!-- <g id="units">
-				{#each cDataFiltered as { Affiliation, affId }, i}
+				{#each cDataFiltered as { Affiliation, affId, Location }, i}
 					<rect
 						x={xScale(Affiliation) || xScale("hac")}
 						y={yScale(affId)}
 						width={xScale.bandwidth()}
 						height={yScale.bandwidth()}
-						fill={Affiliation ? color(Affiliation) : color("hacAligned")}
-					></rect>
+						fill={Affiliation ? color(Affiliation) : color("eu")}
+					>
+						<title>{Location}</title>
+					</rect>
+				{/each}
+			</g> -->
+			<!-- <g id="country-background">
+				{#each countries as { path1, fill, Location }}
+					<path d={path1}>
+						{#if Location}
+							<title>{Location}</title>
+						{/if}
+					</path>
 				{/each}
 			</g> -->
 			<g id="country-group">
-				{#each countries as { path1, path2Coords, fill }}
-					<path d={path1} {fill}></path>
+				{#each countries as { currentPath, fill, Location }}
+					<path d={currentPath} {fill}>
+						{#if Location}
+							<title>{Location}</title>
+						{/if}
+					</path>
 				{/each}
 			</g>
 		</svg>
@@ -180,6 +388,10 @@
 </section>
 
 <style>
+	#country-background {
+		fill: blue;
+	}
+
 	#country-group {
 		stroke: white;
 	}
@@ -194,6 +406,10 @@
 		border: 2px solid orangered;
 		height: 100vh;
 		z-index: 1;
+	}
+
+	#units {
+		opacity: 0.2;
 	}
 
 	.steps-container {

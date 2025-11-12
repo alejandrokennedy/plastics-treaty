@@ -5,18 +5,18 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 484,Mexico,MX,MEX,129739759,hac,,1
 192,Cuba,CU,CUB,11019930.5,lmg,,2
 392,Japan,JP,JPN,124370946.5,hac,,2
-276,Germany,DE,DEU,84548231,hac,TRUE,3
+276,Germany,DE,DEU,84548231,hac,yes,3
 364,Iran (Islamic Republic of),IR,IRN,90608707,lmg,,3
 826,United Kingdom,GB,GBR,68682962.5,hac,,4
 643,Russian Federation,RU,RUS,145440500.5,lmg,,4
-250,France,FR,FRA,66438822,hac,TRUE,5
+250,France,FR,FRA,66438822,hac,yes,5
 682,Saudi Arabia,SA,SAU,33264292,lmg,,5
 404,Kenya,KE,KEN,55339002.5,hac,,6
 170,Colombia,CO,COL,52321152.5,hac,,7
 410,Republic of Korea,KR,KOR,51748739,hac,,8
-724,Spain,ES,ESP,47911579.5,hac,TRUE,9
+724,Spain,ES,ESP,47911579.5,hac,yes,9
 124,Canada,CA,CAN,39299104.5,hac,,10
-616,Poland,PL,POL,38762843.5,hac,TRUE,11
+616,Poland,PL,POL,38762843.5,hac,yes,11
 804,Ukraine,UA,UKR,37732835.5,hac,,12
 604,Peru,PE,PER,33845617,hac,,13
 288,Ghana,GH,GHA,33787914,hac,,14
@@ -26,30 +26,30 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 854,Burkina Faso,BF,BFA,23025776,hac,,18
 454,Malawi,MW,MWI,21104482.5,hac,,19
 152,Chile,CL,CHL,19658835,hac,,20
-642,Romania,RO,ROU,19118478.5,hac,TRUE,21
+642,Romania,RO,ROU,19118478.5,hac,yes,21
 320,Guatemala,GT,GTM,18124837.5,hac,,22
-528,Netherlands,NL,NLD,18092524.5,hac,TRUE,23
+528,Netherlands,NL,NLD,18092524.5,hac,yes,23
 686,Senegal,SN,SEN,18077573.5,hac,,24
 218,Ecuador,EC,ECU,17980083,hac,,25
 324,Guinea,GN,GIN,14405468,hac,,26
 204,Benin,BJ,BEN,14111034.5,hac,,27
 646,Rwanda,RW,RWA,13954471.5,hac,,28
-56,Belgium,BE,BEL,11712893,hac,TRUE,29
+56,Belgium,BE,BEL,11712893,hac,yes,29
 400,Jordan,JO,JOR,11439213.5,hac,,30
 214,Dominican Republic,DO,DOM,11331265.5,hac,,31
 784,United Arab Emirates,AE,ARE,10642081,hac,,32
-752,Sweden,SE,SWE,10551494,hac,TRUE,33
-620,Portugal,PT,PRT,10430738,hac,TRUE,34
+752,Sweden,SE,SWE,10551494,hac,yes,33
+620,Portugal,PT,PRT,10430738,hac,yes,34
 31,Azerbaijan,AZ,AZE,10318207,hac,,35
 768,Togo,TG,TGO,9304337.5,hac,,36
 376,Israel,IL,ISR,9256314,hac,,37
-40,Austria,AT,AUT,9130429,hac,TRUE,38
+40,Austria,AT,AUT,9130429,hac,yes,38
 756,Switzerland,CH,CHE,8870561,hac,,39
-100,Bulgaria,BG,BGR,6795803,hac,TRUE,40
-208,Denmark,DK,DNK,5948136.5,hac,TRUE,41
-246,Finland,FI,FIN,5601185.5,hac,TRUE,42
+100,Bulgaria,BG,BGR,6795803,hac,yes,40
+208,Denmark,DK,DNK,5948136.5,hac,yes,41
+246,Finland,FI,FIN,5601185.5,hac,yes,42
 578,Norway,NO,NOR,5519167,hac,,43
-372,Ireland,IE,IRL,5196630,hac,TRUE,44
+372,Ireland,IE,IRL,5196630,hac,yes,44
 554,New Zealand,NZ,NZL,5172836,hac,,45
 188,Costa Rica,CR,CRI,5105525.5,hac,,46
 591,Panama,PA,PAN,4458759,hac,,47
@@ -58,12 +58,12 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 498,Republic of Moldova,MD,MDA,3067070,hac,,50
 51,Armenia,AM,ARM,2943393,hac,,51
 266,Gabon,GA,GAB,2484788.5,hac,,52
-705,Slovenia,SI,SVN,2118396,hac,TRUE,53
-233,Estonia,EE,EST,1367196,hac,TRUE,54
+705,Slovenia,SI,SVN,2118396,hac,yes,53
+233,Estonia,EE,EST,1367196,hac,yes,54
 480,Mauritius,MU,MUS,1273588,hac,,55
 242,Fiji,FJ,FJI,924145.5,hac,,56
 90,Solomon Islands,SB,SLB,800005.5,hac,,57
-442,Luxembourg,LU,LUX,665098,hac,TRUE,58
+442,Luxembourg,LU,LUX,665098,hac,yes,58
 499,Montenegro,ME,MNE,633552,hac,,59
 462,Maldives,MV,MDV,525994,hac,,60
 132,Cabo Verde,CV,CPV,522330.5,hac,,61
@@ -79,16 +79,16 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 585,Palau,PW,PLW,17727.5,hac,,71
 184,Cook Islands,CK,COK,14222,hac,,72
 798,Tuvalu,TV,TUV,9815.5,hac,,73
-380,Italy,IT,ITA,59499453,,FALSE,74
-203,Czechia,CZ,CZE,10809716,,FALSE,75
-300,Greece,GR,GRC,10242908.5,,FALSE,76
-348,Hungary,HU,HUN,9686463.5,,FALSE,77
-703,Slovakia,SK,SVK,5518054.5,,FALSE,78
-191,Croatia,HR,HRV,3896023.5,,FALSE,79
-440,Lithuania,LT,LTU,2854099,,FALSE,80
-428,Latvia,LV,LVA,1882396,,FALSE,81
-196,Cyprus,CY,CYP,1344975.5,,FALSE,82
-470,Malta,MT,MLT,532956,,FALSE,83
+380,Italy,IT,ITA,59499453,eu,no,74
+203,Czechia,CZ,CZE,10809716,eu,no,75
+300,Greece,GR,GRC,10242908.5,eu,no,76
+348,Hungary,HU,HUN,9686463.5,eu,no,77
+703,Slovakia,SK,SVK,5518054.5,eu,no,78
+191,Croatia,HR,HRV,3896023.5,eu,no,79
+440,Lithuania,LT,LTU,2854099,eu,no,80
+428,Latvia,LV,LVA,1882396,eu,no,81
+196,Cyprus,CY,CYP,1344975.5,eu,no,82
+470,Malta,MT,MLT,532956,eu,no,83
 900,World,1W,WLD,8091734930,,,
 902,Developing regions,DR,DGR,6807234408,,,
 1859,Low-and-middle-income countries,WB,LMC,6801234426,,,
