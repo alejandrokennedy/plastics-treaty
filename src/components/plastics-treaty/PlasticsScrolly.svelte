@@ -3,6 +3,7 @@
   make sure only needed countries are added to geoOneTen (adjust compositing)
   make json from composit (in other file), import json
   position/tweak unit chart
+  remove interpolators for non-tranitioning countries (break countries into two groups?)
   axes
     x: affiliation
     y: countries? flags?
@@ -84,9 +85,6 @@
 	});
 
 	const cDataFiltered = countryData.filter((d) => d.Affiliation);
-	const cDataSuperFiltered = cDataFiltered.filter(
-		(d) => d.Affiliation === "hac" || d.Affiliation === "eu"
-	);
 
 	let step = $state(null);
 	let width = $state(600);
@@ -162,8 +160,7 @@
 		)
 	);
 
-	// console.warn("---");
-
+	// scales setup
 	const margin = { top: 20, left: 300, bottom: 20, right: 300 };
 	let xScale = $derived(
 		scaleBand()
@@ -183,41 +180,30 @@
 	);
 
 	// stacks
-	const makeStack = (data, val, name) => {
-		const total = sum(data, (d) => d[val]);
+	const hacGroup = countryData.filter(
+		(d) => d.Affiliation === "hac" || d.Affiliation === "eu"
+	);
+	const lmgGroup = countryData.filter((d) => d.Affiliation === "lmg");
+	const popDiff = sum(lmgGroup, (d) => d.Value) - sum(hacGroup, (d) => d.Value);
+
+	const makeStack = (data, val, name, buffer = 0) => {
+		const total = sum(data, (d) => d[val]) + buffer;
 		let value = 0;
-		return {
-			stack: index(
-				data.map((d) => ({
-					...d,
-					name: d[name],
-					value: d[val] / total,
-					startValue: value / total,
-					endValue: (value += d[val]) / total
-				})),
-				(d) => d.LocationId
-			),
-			total: total
-		};
+		return index(
+			data.map((d) => ({
+				...d,
+				name: d[name],
+				value: d[val] / total,
+				startValue: value / total,
+				endValue: (value += d[val]) / total
+			})),
+			(d) => d.LocationId
+		);
 	};
 
-	const hacStack = makeStack(
-		countryData.filter(
-			(d) => d.Affiliation === "hac" || d.Affiliation === "eu"
-		),
-		"Value",
-		"LocationId"
-	);
-
-	const lmgStack = makeStack(
-		countryData.filter((d) => d.Affiliation === "lmg"),
-		"Value",
-		"LocationId"
-	);
-
-	console.log("hacStack.stack", hacStack.stack);
-	console.log("hacStack.stack.get(566)", hacStack.stack.get(566));
-	// console.log("lmgStack", lmgStack);
+	const hacStack = makeStack(hacGroup, "Value", "LocationId", popDiff);
+	const lmgStack = makeStack(lmgGroup, "Value", "LocationId");
+	const stack = new Map([...hacStack, ...lmgStack]);
 
 	const yStackScale = $derived(
 		scaleLinear()
@@ -324,24 +310,21 @@
 <section id="plastics-scrolly">
 	<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 		<svg id="svg" {width} {height}>
-			<g id="stack">
-				{#each cDataSuperFiltered as { Affiliation, affId, Location, LocationId }, i}
-					<!-- {console.log("---")}
-					{console.log(yStackScale(hacStack.stack.get(LocationId).startValue))}
-					{console.log(hacStack.stack.get(LocationId).startValue)} -->
+			<g class="stack">
+				{#each cDataFiltered as { Affiliation, Location, LocationId }, i}
 					<rect
 						x={xScale(Affiliation) || xScale("hac")}
-						y={yStackScale(hacStack.stack.get(LocationId).endValue)}
+						y={yStackScale(stack.get(LocationId).endValue)}
 						width={xScale.bandwidth()}
-						height={yStackScale(hacStack.stack.get(LocationId).startValue) -
-							yStackScale(hacStack.stack.get(LocationId).endValue)}
-						fill={Affiliation ? color(Affiliation) : color("eu")}
+						height={yStackScale(stack.get(LocationId).startValue) -
+							yStackScale(stack.get(LocationId).endValue)}
+						fill={Affiliation ? color(Affiliation) : "blue"}
 					>
 						<title>{Location}</title>
 					</rect>
 				{/each}
 			</g>
-			<!-- <g id="units">
+			<!-- <g class="units">
 				{#each cDataFiltered as { Affiliation, affId, Location }, i}
 					<rect
 						x={xScale(Affiliation) || xScale("hac")}
@@ -408,7 +391,8 @@
 		z-index: 1;
 	}
 
-	#units {
+	.units,
+	.stack {
 		opacity: 0.2;
 	}
 
