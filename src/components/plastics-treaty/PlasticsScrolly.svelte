@@ -47,7 +47,6 @@
 	// }));
 
 	let chapters = $state([]);
-
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -91,44 +90,6 @@
 			controller.abort();
 		};
 	});
-
-	// let chapters = $state([]);
-
-	// let loading = $state(true);
-	// let error = $state<string | null>(null);
-
-	// const chaptersUrl =
-	// 	"https://docs.google.com/spreadsheets/d/e/2PACX-1vRkBD_sIXbVLDPBA2y5mlJviA-Xj2uDa6ZTGZQvr7By3Bf-H0uFpCGWh0RvglX-XtodPkQgQmcizFLC/pub?gid=569490652&single=true&output=csv";
-
-	// onMount(() => {
-	// 	const controller = new AbortController();
-
-	// 	const fetchData = async (url: string) => {
-	// 		loading = true;
-	// 		error = null;
-
-	// 		try {
-	// 			const result = await csv(url, {
-	// 				signal: controller.signal
-	// 			});
-	// 			chapters = result;
-	// 		} catch (err) {
-	// 			if (err instanceof Error && err.name === "AbortError") {
-	// 				return; //Component unmounted
-	// 			}
-	// 			error = err instanceof Error ? err.message : "Failed to fetch data";
-	// 			console.error(`error fetching data: ${err}`);
-	// 		} finally {
-	// 			loading = false;
-	// 		}
-	// 	};
-
-	// 	fetchData(chaptersUrl);
-
-	// 	return () => {
-	// 		controller.abort();
-	// 	};
-	// });
 
 	// $inspect("chapters", chapters);
 
@@ -365,23 +326,11 @@
 				// Single polygon: use toRect to morph directly to rectangle
 				interpol1 = browser ? flubber.toRect(path1, x, y, width, height) : null;
 			}
-			let fill = "whitesmoke"; // default color
-
-			if (step > 0 && affiliation === "hac") {
-				fill = color("hac");
-			}
-			if (step > 2 && affiliation === "lmg") {
-				fill = color("lmg");
-			}
-			if (step > 1 && euExplicit === "no") {
-				fill = color("eu");
-			}
 
 			return {
 				...c,
 				path1,
 				affiliation,
-				fill,
 				interpol1,
 				interpol2,
 				Location: d?.Location
@@ -420,13 +369,23 @@
 		if (step === 3) return paths1;
 		return countries.map((c) => c.path1);
 	});
+
+	const countryFills = $derived(
+		countries.map((c) => {
+			if (step > 0 && c.affiliation === "hac") return color("hac");
+			if (step > 1 && c.affiliation === "eu") return color("eu");
+			if (step > 2 && c.affiliation === "lmg") return color("lmg");
+			return "whitesmoke";
+		})
+	);
 </script>
 
 {#if chapters.length > 0}
 	<section id="plastics-scrolly">
 		<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 			<svg id="svg" {width} {height}>
-				{#if step < 4 && step > -1}
+				<!-- {#if step < 4 && step > -1} -->
+				{#if step < 4 && step !== null && step !== undefined}
 					<g transition:fade id="static-countries">
 						{#each staticCountries as { path, Location }}
 							<path d={path} fill="whitesmoke">
@@ -437,10 +396,11 @@
 						{/each}
 					</g>
 				{/if}
-				{#if step > -1}
+				<!-- {#if step > -1} -->
+				{#if step !== null && step !== undefined}
 					<g transition:fade id="country-group">
-						{#each countries as { fill, Location }, i}
-							<path d={currentPaths[i]} {fill}>
+						{#each countries as { Location }, i}
+							<path d={currentPaths[i]} fill={countryFills[i]}>
 								{#if Location}
 									<title>{Location}</title>
 								{/if}
