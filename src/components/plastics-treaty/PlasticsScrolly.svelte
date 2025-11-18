@@ -1,14 +1,15 @@
 <!--
-  sort units (by pop)
+  sort units/data (by pop)
   make sure only needed countries are added to geoOneTen (adjust compositing)
+  debug Location missing for USA, others (mostly in the americas)
   make json from composit (in other file), import json
-  position/tweak unit chart
+  position/tweak unit + stack chart scales
   remove interpolators for non-tranitioning countries (break countries into two groups?)
   axes
     x: affiliation
     y: countries? flags?
   base margins on w&h
-  add typescript, fix errors
+  fix ts errors
   install types
 -->
 
@@ -28,7 +29,7 @@
 	import Scrolly from "$components/helpers/Scrolly.svelte";
 	import { getContext, onMount } from "svelte";
 	import { browser } from "$app/environment";
-	import { tweened } from "svelte/motion";
+	import { Tween } from "svelte/motion";
 	import worldOneTen from "$data/worldOneTen.json";
 	import worldFifty from "$data/worldFifty.json";
 	import worldTen from "$data/worldTen.json";
@@ -36,8 +37,14 @@
 	import { geoWinkel3 } from "d3-geo-projection";
 	import { feature } from "topojson-client";
 	import * as flubber from "flubber";
+	import { fade } from "svelte/transition";
 
-	const chapters = getContext("chapters");
+	const chaptersRaw = getContext("chapters");
+	const chapters = chaptersRaw.map((c) => ({
+		...c,
+		progress1: c.progress1 != null ? +c.progress1 : 0,
+		progress2: c.progress2 != null ? +c.progress2 : 0
+	}));
 	// let chapters = $state([]);
 
 	// let loading = $state(true);
@@ -90,22 +97,13 @@
 	let width = $state(600);
 	let height = $state(400);
 
-	// Tweened progress (0 to 1) for smooth morphing animation
-	const progress = tweened(0, {
-		duration: 5800, // Animation duration in milliseconds
-		easing: (t) => t * t * (3 - 2 * t) // Smoothstep easing
-	});
+	const tweenConfig = {
+		duration: 800,
+		easing: (t) => t * t * (3 - 2 * t) // Smoothstep
+	};
 
-	// Update progress when step changes
-	$effect(() => {
-		if (step === null || step === undefined || step < 4) {
-			progress.set(0);
-		} else if (step === 4) {
-			progress.set(1);
-		} else {
-			progress.set(1);
-		}
-	});
+	const progress1 = new Tween(0, tweenConfig);
+	const progress2 = new Tween(0, tweenConfig);
 
 	// Multi-resolution compositing: combine features from all three resolutions
 	// Start with 110m (smallest file), then add missing from 50m, then 10m
@@ -219,98 +217,168 @@
 		.domain(["hac", "lmg", "eu"])
 		.range([hacColor, lmgColor, euColor]);
 
-	// Enhance countries with affiliation data and computed fill color
+	// Split countries into static (no data) and dynamic (with data)
+	const { rawStaticCountries, rawCountries } = $derived.by(() => {
+		if (!geojson?.features) return { rawStaticCountries: [], rawCountries: [] };
+
+		const static_ = [];
+		const dynamic = [];
+
+		for (const country of geojson.features) {
+			const metaData = countryIndex?.get(country.id) || null;
+			if (metaData) {
+				// $inspect("country", country);
+				// $inspect("metaData", metaData);
+				if (metaData.Affiliation) {
+					dynamic.push({ ...country, ...metaData });
+				} else {
+					static_.push({ ...country, ...metaData });
+				}
+			} else {
+				static_.push(country);
+			}
+		}
+
+		return { rawStaticCountries: static_, rawCountries: dynamic };
+	});
+
+	const staticCountries = $derived(
+		rawStaticCountries.map((c) => ({
+			id: c.id,
+			path: pathGenerator(c),
+			Location: c.Location || "unknown"
+		}))
+	);
+
+	// Enhance dynamic countries with affiliation data and computed fill color
 	let countries = $derived(
-		geojson?.features.map((country) => {
-			const d = countryIndex.get(country.id) || null;
+		rawCountries.map((c) => {
+			const d = countryIndex.get(c.id);
 			const affiliation = d?.Affiliation || "";
 			const euExplicit = d?.euExplicit || "";
 			const affId = d?.affId ?? null;
-			const path1 = pathGenerator(country);
+			const path1 = pathGenerator(c);
 
-			let currentPath;
+			let interpol1 = null;
+			let interpol2 = null;
+			// Validate all rectangle parameters before creating interpolator
+			const x = xScale(affiliation) || xScale("hac");
+			const y = yScale(affId);
+			const width = xScale.bandwidth();
+			const height = yScale.bandwidth();
 
-			if (!affiliation) {
-				currentPath = path1;
-			} else {
-				// Validate all rectangle parameters before creating interpolator
-				const x = xScale(affiliation) || xScale("hac");
-				const y = yScale(affId);
-				const width = xScale.bandwidth();
-				const height = yScale.bandwidth();
-				// Handle MultiPolygons using flubber.combine() to morph ALL pieces to rectangle
-				if (country.geometry.type === "MultiPolygon" && browser) {
-					// Extract all polygons from the MultiPolygon (not just the largest)
-					const polygons = country.geometry.coordinates;
-					// Convert each polygon piece to an SVG path string
-					const polygonPaths = polygons.map((polygonCoords) => {
-						const polygonFeature = {
-							type: "Feature",
-							geometry: {
-								type: "Polygon",
-								coordinates: polygonCoords
-							}
-						};
-						return pathGenerator(polygonFeature);
-					});
-					// Create the target rectangle as an SVG path string
-					const rectPath = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
+			const x2 = xScale(affiliation) || xScale("hac");
+			const y2 = yStackScale(stack.get(c.id).endValue);
+			const width2 = xScale.bandwidth();
+			const height2 =
+				yStackScale(stack.get(c.id).startValue) -
+				yStackScale(stack.get(c.id).endValue);
 
-					try {
-						// Use flubber.combine to morph all polygon pieces into one rectangle
-						const interpolator = flubber.combine(
-							polygonPaths, // FROM: all pieces of the country (e.g., Russia's islands + mainland)
-							rectPath, // TO: one rectangle
-							{ single: true } // Return one combined path string
-						);
-						currentPath = interpolator($progress);
-					} catch (error) {
-						// console.warn("Failed to combine MultiPolygon");
-						// console.warn(
-						// 	`Failed to combine MultiPolygon for ${d?.Location}:`,
-						// 	error
-						// );
-						currentPath = path1;
-					}
-				} else {
-					// Single polygon: use toRect to morph directly to rectangle
-					const interpolator = browser
-						? flubber.toRect(path1, x, y, width, height)
-						: null;
+			// Create the target rectangle as an SVG path string
+			const rectPath = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
 
-					currentPath =
-						browser && interpolator ? interpolator($progress) : path1;
+			interpol2 = browser
+				? flubber.toRect(rectPath, x2, y2, width2, height2)
+				: null;
+
+			// console.log("interpol2", interpol2);
+
+			// Handle MultiPolygons using flubber.combine() to morph ALL pieces to rectangle
+			if (c.geometry.type === "MultiPolygon" && browser) {
+				// Extract all polygons from the MultiPolygon (not just the largest)
+				const polygons = c.geometry.coordinates;
+				// Convert each polygon piece to an SVG path string
+				const polygonPaths = polygons.map((polygonCoords) => {
+					const polygonFeature = {
+						type: "Feature",
+						geometry: {
+							type: "Polygon",
+							coordinates: polygonCoords
+						}
+					};
+					return pathGenerator(polygonFeature);
+				});
+
+				try {
+					// Use flubber.combine to morph all polygon pieces into one rectangle
+					interpol1 = flubber.combine(
+						polygonPaths, // FROM: all pieces of the country (e.g., Russia's islands + mainland)
+						rectPath, // TO: one rectangle
+						{ single: true } // Return one combined path string
+					);
+				} catch (error) {
+					// console.warn("Failed to combine MultiPolygon");
+					// console.warn(
+					// 	`Failed to combine MultiPolygon for ${d?.Location}:`,
+					// 	error
+					// );
+					interpol1 = null;
 				}
+			} else {
+				// Single polygon: use toRect to morph directly to rectangle
+				interpol1 = browser ? flubber.toRect(path1, x, y, width, height) : null;
 			}
-
 			let fill = "whitesmoke"; // default color
 
 			if (step > 0 && affiliation === "hac") {
 				fill = color("hac");
 			}
-			if (step > 1 && affiliation === "lmg") {
+			if (step > 2 && affiliation === "lmg") {
 				fill = color("lmg");
 			}
-			if (step > 2 && euExplicit === "no") {
+			if (step > 1 && euExplicit === "no") {
 				fill = color("eu");
 			}
 
 			return {
-				...country,
+				...c,
 				path1,
-				currentPath,
 				affiliation,
 				fill,
+				interpol1,
+				interpol2,
 				Location: d?.Location
 			};
 		}) ?? []
 	);
+
+	const interpolators1 = $derived(countries.map((d) => d.interpol1));
+	const interpolators2 = $derived(countries.map((d) => d.interpol2));
+
+	const paths1 = $derived.by(() => {
+		const p = progress1.current;
+		return interpolators1.map((fn) => (fn ? fn(p) : null));
+	});
+
+	const paths2 = $derived.by(() => {
+		const p = progress2.current;
+		return interpolators2.map((fn) => (fn ? fn(p) : null));
+	});
+
+	// Update tween targets based on step
+	$effect(() => {
+		const chapter = chapters[step];
+		if (chapter) {
+			progress1.target = chapter.progress1;
+			progress2.target = chapter.progress2;
+		}
+	});
+
+	const currentPaths = $derived.by(() => {
+		if (step === null || step === undefined || step < 3) {
+			return countries.map((c) => c.path1);
+		}
+		if (step >= 5) return paths2;
+		if (step === 4) return progress2.current > 0 ? paths2 : paths1;
+		if (step === 3) return paths1;
+		return countries.map((c) => c.path1);
+	});
 </script>
 
 <section id="plastics-scrolly">
 	<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 		<svg id="svg" {width} {height}>
-			<g class="stack">
+			<!-- <g class="stack">
 				{#each cDataFiltered as { Affiliation, Location, LocationId }, i}
 					<rect
 						x={xScale(Affiliation) || xScale("hac")}
@@ -323,7 +391,7 @@
 						<title>{Location}</title>
 					</rect>
 				{/each}
-			</g>
+			</g> -->
 			<!-- <g class="units">
 				{#each cDataFiltered as { Affiliation, affId, Location }, i}
 					<rect
@@ -346,15 +414,28 @@
 					</path>
 				{/each}
 			</g> -->
-			<g id="country-group">
-				{#each countries as { currentPath, fill, Location }}
-					<path d={currentPath} {fill}>
-						{#if Location}
-							<title>{Location}</title>
-						{/if}
-					</path>
-				{/each}
-			</g>
+			{#if step < 4 && step > -1}
+				<g transition:fade id="static-countries">
+					{#each staticCountries as { path, Location }}
+						<path d={path} fill="whitesmoke">
+							{#if Location}
+								<title>{Location}</title>
+							{/if}
+						</path>
+					{/each}
+				</g>
+			{/if}
+			{#if step > -1}
+				<g transition:fade id="country-group">
+					{#each countries as { fill, Location }, i}
+						<path d={currentPaths[i]} {fill}>
+							{#if Location}
+								<title>{Location}</title>
+							{/if}
+						</path>
+					{/each}
+				</g>
+			{/if}
 		</svg>
 	</div>
 	<div class="spacer"></div>
@@ -377,6 +458,11 @@
 
 	#country-group {
 		stroke: white;
+	}
+
+	#static-countries {
+		stroke: white;
+		fill: "whitesmoke";
 	}
 
 	#country-group path {

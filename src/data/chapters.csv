@@ -1,7 +1,8 @@
-type,chapter
-text,There are two coalitions involved in the Plastics Treaty
-text,The first is the High Ambition Coalition
-text,The second is the Like Minded Group
-text,"These countries haven't explicitly joined the HAC but, because the EU votes as a block, they are implicitly aligned with the HAC"
-text,If we count the number of countries in each group...
-text,"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+type,chapter,progress1,progress2
+text,There are two coalitions involved in the Plastics Treaty,0,0
+text,The first is the High Ambition Coalition,0,0
+text,"These countries haven't explicitly joined the HAC but, because the EU votes as a block, they are implicitly aligned with the HAC",0,0
+text,The second is the Like Minded Group,0,0
+text,If we count the number of countries in each group...,1,0
+text,"However, if we look at population figures for each country, we get a different story",1,1
+text,...and this should be step 6,1,1
