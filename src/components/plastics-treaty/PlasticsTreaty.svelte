@@ -3,7 +3,6 @@
 </script>
 
 <div id="plastics-treaty">
-	<p>plastics-treaty</p>
 	<PlasticsScrolly />
 </div>
 

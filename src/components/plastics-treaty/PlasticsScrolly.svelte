@@ -39,12 +39,59 @@
 	import * as flubber from "flubber";
 	import { fade } from "svelte/transition";
 
-	const chaptersRaw = getContext("chapters");
-	const chapters = chaptersRaw.map((c) => ({
-		...c,
-		progress1: c.progress1 != null ? +c.progress1 : 0,
-		progress2: c.progress2 != null ? +c.progress2 : 0
-	}));
+	// const chaptersRaw = getContext("chapters");
+	// const chapters = chaptersRaw.map((c) => ({
+	// 	...c,
+	// 	progress1: c.progress1 != null ? +c.progress1 : 0,
+	// 	progress2: c.progress2 != null ? +c.progress2 : 0
+	// }));
+
+	let chapters = $state([]);
+
+	let loading = $state(false);
+	let error = $state<string | null>(null);
+
+	const chaptersUrl =
+		"https://docs.google.com/spreadsheets/d/e/2PACX-1vRa1NZXIvX-dy8v7LuKi6witAHmbcXtyWBm2Bs6jXNdX6Z28QhiFcC1h58B_Pj0Bnd1xBltCeNCZGSw/pub?gid=0&single=true&output=csv";
+
+	onMount(() => {
+		const controller = new AbortController();
+
+		const fetchData = async (url: string) => {
+			loading = true;
+			error = null;
+
+			try {
+				const result = await csv(url, {
+					signal: controller.signal
+				});
+
+				// Process the fetched data
+				chapters = result.map((c) => ({
+					...c,
+					progress1: c.progress1 != null ? +c.progress1 : 0,
+					progress2: c.progress2 != null ? +c.progress2 : 0
+				}));
+
+				console.log("Fetched chapters:", chapters);
+			} catch (err) {
+				if (err instanceof Error && err.name === "AbortError") {
+					return; // Component unmounted
+				}
+				error = err instanceof Error ? err.message : "Failed to fetch data";
+				console.error(`Error fetching data:`, err);
+			} finally {
+				loading = false;
+			}
+		};
+
+		fetchData(chaptersUrl);
+
+		return () => {
+			controller.abort();
+		};
+	});
+
 	// let chapters = $state([]);
 
 	// let loading = $state(true);
@@ -375,81 +422,47 @@
 	});
 </script>
 
-<section id="plastics-scrolly">
-	<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
-		<svg id="svg" {width} {height}>
-			<!-- <g class="stack">
-				{#each cDataFiltered as { Affiliation, Location, LocationId }, i}
-					<rect
-						x={xScale(Affiliation) || xScale("hac")}
-						y={yStackScale(stack.get(LocationId).endValue)}
-						width={xScale.bandwidth()}
-						height={yStackScale(stack.get(LocationId).startValue) -
-							yStackScale(stack.get(LocationId).endValue)}
-						fill={Affiliation ? color(Affiliation) : "blue"}
-					>
-						<title>{Location}</title>
-					</rect>
+{#if chapters.length > 0}
+	<section id="plastics-scrolly">
+		<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
+			<svg id="svg" {width} {height}>
+				{#if step < 4 && step > -1}
+					<g transition:fade id="static-countries">
+						{#each staticCountries as { path, Location }}
+							<path d={path} fill="whitesmoke">
+								{#if Location}
+									<title>{Location}</title>
+								{/if}
+							</path>
+						{/each}
+					</g>
+				{/if}
+				{#if step > -1}
+					<g transition:fade id="country-group">
+						{#each countries as { fill, Location }, i}
+							<path d={currentPaths[i]} {fill}>
+								{#if Location}
+									<title>{Location}</title>
+								{/if}
+							</path>
+						{/each}
+					</g>
+				{/if}
+			</svg>
+		</div>
+		<div class="spacer"></div>
+		<div class="steps-container">
+			<Scrolly bind:value={step}>
+				{#each chapters as { chapter }, i}
+					{@const active = step === i}
+					<div class="step text-outline" class:active>
+						<p>{chapter}</p>
+					</div>
 				{/each}
-			</g> -->
-			<!-- <g class="units">
-				{#each cDataFiltered as { Affiliation, affId, Location }, i}
-					<rect
-						x={xScale(Affiliation) || xScale("hac")}
-						y={yScale(affId)}
-						width={xScale.bandwidth()}
-						height={yScale.bandwidth()}
-						fill={Affiliation ? color(Affiliation) : color("eu")}
-					>
-						<title>{Location}</title>
-					</rect>
-				{/each}
-			</g> -->
-			<!-- <g id="country-background">
-				{#each countries as { path1, fill, Location }}
-					<path d={path1}>
-						{#if Location}
-							<title>{Location}</title>
-						{/if}
-					</path>
-				{/each}
-			</g> -->
-			{#if step < 4 && step > -1}
-				<g transition:fade id="static-countries">
-					{#each staticCountries as { path, Location }}
-						<path d={path} fill="whitesmoke">
-							{#if Location}
-								<title>{Location}</title>
-							{/if}
-						</path>
-					{/each}
-				</g>
-			{/if}
-			{#if step > -1}
-				<g transition:fade id="country-group">
-					{#each countries as { fill, Location }, i}
-						<path d={currentPaths[i]} {fill}>
-							{#if Location}
-								<title>{Location}</title>
-							{/if}
-						</path>
-					{/each}
-				</g>
-			{/if}
-		</svg>
-	</div>
-	<div class="spacer"></div>
-	<div class="steps-container">
-		<Scrolly bind:value={step}>
-			{#each chapters as { chapter }, i}
-				{@const active = step === i}
-				<div class="step text-outline" class:active>
-					<p>{chapter}</p>
-				</div>
-			{/each}
-		</Scrolly>
-	</div>
-</section>
+			</Scrolly>
+		</div>
+	</section>
+{/if}
 
 <style>
 	#country-background {
@@ -472,7 +485,7 @@
 	#viz-container {
 		position: sticky;
 		top: 0em;
-		border: 2px solid orangered;
+		/*border: 2px solid orangered;*/
 		height: 100vh;
 		z-index: 1;
 	}
