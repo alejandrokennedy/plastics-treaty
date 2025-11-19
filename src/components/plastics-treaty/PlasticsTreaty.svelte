@@ -10,7 +10,5 @@
 	#plastics-treaty {
 		max-width: 100rem;
 		width: 100%;
-		margin: 0 auto;
-		padding: 0;
 	}
 </style>

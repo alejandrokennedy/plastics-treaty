@@ -1,18 +1,3 @@
-<!--
-  sort units/data (by pop)
-  make sure only needed countries are added to geoOneTen (adjust compositing)
-  debug Location missing for USA, others (mostly in the americas)
-  make json from composit (in other file), import json
-  position/tweak unit + stack chart scales
-  remove interpolators for non-tranitioning countries (break countries into two groups?)
-  axes
-    x: affiliation
-    y: countries? flags?
-  base margins on w&h
-  fix ts errors
-  install types
--->
-
 <script lang="ts">
 	import {
 		geoPath,
@@ -72,7 +57,7 @@
 					progress2: c.progress2 != null ? +c.progress2 : 0
 				}));
 
-				console.log("Fetched chapters:", chapters);
+				// console.log("Fetched chapters:", chapters);
 			} catch (err) {
 				if (err instanceof Error && err.name === "AbortError") {
 					return; // Component unmounted
@@ -98,8 +83,6 @@
 			(d.Value = +d.Value),
 			(d.affId = +d.affId));
 	});
-
-	const cDataFiltered = countryData.filter((d) => d.Affiliation);
 
 	let step = $state(null);
 	let width = $state(600);
@@ -149,13 +132,33 @@
 	// console.log(
 	// 	`Total countries after compositing: ${processedGeo.features.length}`
 	// );
-
 	// console.log("processedGeo", processedGeo);
 
 	let geojson = $state(processedGeo);
+
+	// let projection = $derived(
+	// 	geoWinkel3().rotate([-10.2, 0]).fitSize([width, height], geojson)
+	// );
+
+	let leftSpace = $derived(width < 768 ? 0 : Math.min(width * 0.15, 150)); // No space on mobile
+	let rightMapTrim = $derived((width + leftSpace) * 0.07);
+
+	// $inspect("leftSpace", leftSpace);
+
 	let projection = $derived(
-		geoWinkel3().rotate([-10.2, 0]).fitSize([width, height], geojson)
+		geoWinkel3()
+			.rotate([-10.2, 0])
+			.fitExtent(
+				[
+					[leftSpace, 0],
+					[width + rightMapTrim, height]
+					// [0, 0],
+					// [width, height]
+				],
+				geojson
+			)
 	);
+
 	let pathGenerator = $derived(geoPath(projection));
 	let countryIndex = $derived(index(countryData, (d) => d.LocationId));
 	let affiliationRollup = $derived(
@@ -167,7 +170,13 @@
 	);
 
 	// scales setup
-	const margin = { top: 20, left: 300, bottom: 20, right: 300 };
+	const maxXWidth = $derived(Math.max(Math.min(500, width * 0.7), 230));
+	const margin = $derived({
+		top: 20,
+		left: width / 2 - maxXWidth / 2 + leftSpace,
+		bottom: 20,
+		right: width / 2 - maxXWidth / 2
+	});
 	let xScale = $derived(
 		scaleBand()
 			.domain(["hac", "lmg"])
@@ -235,8 +244,6 @@
 		for (const country of geojson.features) {
 			const metaData = countryIndex?.get(country.id) || null;
 			if (metaData) {
-				// $inspect("country", country);
-				// $inspect("metaData", metaData);
 				if (metaData.Affiliation) {
 					dynamic.push({ ...country, ...metaData });
 				} else {
@@ -254,16 +261,16 @@
 		rawStaticCountries.map((c) => ({
 			id: c.id,
 			path: pathGenerator(c),
-			Location: c.Location || "unknown"
+			Location: c.Location || ""
 		}))
 	);
 
-	// Enhance dynamic countries with affiliation data and computed fill color
+	// Enhance dynamic countries with affiliation data
 	let countries = $derived(
 		rawCountries.map((c) => {
 			const d = countryIndex.get(c.id);
 			const affiliation = d?.Affiliation || "";
-			const euExplicit = d?.euExplicit || "";
+			// const euExplicit = d?.euExplicit || "";
 			const affId = d?.affId ?? null;
 			const path1 = pathGenerator(c);
 
@@ -281,16 +288,12 @@
 			const height2 =
 				yStackScale(stack.get(c.id).startValue) -
 				yStackScale(stack.get(c.id).endValue);
-
 			// Create the target rectangle as an SVG path string
 			const rectPath = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
 
 			interpol2 = browser
 				? flubber.toRect(rectPath, x2, y2, width2, height2)
 				: null;
-
-			// console.log("interpol2", interpol2);
-
 			// Handle MultiPolygons using flubber.combine() to morph ALL pieces to rectangle
 			if (c.geometry.type === "MultiPolygon" && browser) {
 				// Extract all polygons from the MultiPolygon (not just the largest)
@@ -316,10 +319,10 @@
 					);
 				} catch (error) {
 					// console.warn("Failed to combine MultiPolygon");
-					// console.warn(
-					// 	`Failed to combine MultiPolygon for ${d?.Location}:`,
-					// 	error
-					// );
+					console.warn(
+						`Failed to combine MultiPolygon for ${d?.Location}:`,
+						error
+					);
 					interpol1 = null;
 				}
 			} else {
@@ -384,8 +387,7 @@
 	<section id="plastics-scrolly">
 		<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 			<svg id="svg" {width} {height}>
-				<!-- {#if step < 4 && step > -1} -->
-				{#if step < 4 && step !== null && step !== undefined}
+				{#if step < 4 && step != null}
 					<g transition:fade id="static-countries">
 						{#each staticCountries as { path, Location }}
 							<path d={path} fill="whitesmoke">
@@ -396,8 +398,7 @@
 						{/each}
 					</g>
 				{/if}
-				<!-- {#if step > -1} -->
-				{#if step !== null && step !== undefined}
+				{#if step != null}
 					<g transition:fade id="country-group">
 						{#each countries as { Location }, i}
 							<path d={currentPaths[i]} fill={countryFills[i]}>
@@ -444,9 +445,10 @@
 
 	#viz-container {
 		position: sticky;
-		top: 0em;
-		/*border: 2px solid orangered;*/
-		height: 100vh;
+		top: 65px;
+		border: 2px solid orangered;
+		/*height: 100vh;*/
+		height: calc(100vh - 65px - 70px);
 		z-index: 1;
 	}
 
