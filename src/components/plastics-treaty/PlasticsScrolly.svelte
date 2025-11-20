@@ -476,5 +476,38 @@
 	.step p {
 		padding: 1rem;
 		/*background: var(--color-gray-100);*/
+		font-size: 1rem;
+		background: whitesmoke;
+		color: #ccc;
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		transition: background 500ms ease;
+		box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+		text-align: left;
+		width: 75%;
+		margin: auto;
+		max-width: 500px;
+	}
+
+	.step.active p {
+		background: white;
+		color: black;
+	}
+
+	@media screen and (max-width: 768px) {
+		/*.section-container {
+			flex-direction: column-reverse;
+		}*/
+
+		/*#viz-container {
+			width: 95%;
+			margin: auto;
+		}*/
+
+		.steps-container {
+			width: 100%;
+		}
 	}
 </style>
