@@ -445,10 +445,10 @@
 
 	#viz-container {
 		position: sticky;
-		top: 65px;
+		top: calc(65px + 56px);
 		border: 2px solid orangered;
 		/*height: 100vh;*/
-		height: calc(100vh - 65px - 70px);
+		height: calc(100vh - calc(65px + 56px) - 70px);
 		z-index: 1;
 	}
 
@@ -467,15 +467,16 @@
 	}
 
 	.step {
-		height: 70vh;
-		/*background: var(--color-gray-100);*/
+		padding-top: 20vh;
+		padding-bottom: 60vh;
+		/*border: 1px solid gold;*/
 		text-align: center;
 		position: relative; /* needed? */
 	}
 
 	.step p {
 		padding: 1rem;
-		/*background: var(--color-gray-100);*/
+		background: var(--color-gray-100);
 		font-size: 1rem;
 		background: whitesmoke;
 		color: #ccc;

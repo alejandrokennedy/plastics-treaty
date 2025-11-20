@@ -5,3 +5,4 @@ node_modules
 build
 functions
 .env
+src/components/plastics-treaty/PlScResponsive.svelte
