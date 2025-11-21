@@ -1,94 +1,4 @@
 LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
-48,Bahrain,BH,BHR,1569665.5,lmg,,0
-566,Nigeria,NG,NGA,227882945,hac,,0
-156,China,CN,CHN,1422584933,lmg,,1
-484,Mexico,MX,MEX,129739759,hac,,1
-192,Cuba,CU,CUB,11019930.5,lmg,,2
-392,Japan,JP,JPN,124370946.5,hac,,2
-276,Germany,DE,DEU,84548231,hac,yes,3
-364,Iran (Islamic Republic of),IR,IRN,90608707,lmg,,3
-826,United Kingdom,GB,GBR,68682962.5,hac,,4
-643,Russian Federation,RU,RUS,145440500.5,lmg,,4
-250,France,FR,FRA,66438822,hac,yes,5
-682,Saudi Arabia,SA,SAU,33264292,lmg,,5
-404,Kenya,KE,KEN,55339002.5,hac,,6
-170,Colombia,CO,COL,52321152.5,hac,,7
-410,Republic of Korea,KR,KOR,51748739,hac,,8
-724,Spain,ES,ESP,47911579.5,hac,yes,9
-124,Canada,CA,CAN,39299104.5,hac,,10
-616,Poland,PL,POL,38762843.5,hac,yes,11
-804,Ukraine,UA,UKR,37732835.5,hac,,12
-604,Peru,PE,PER,33845617,hac,,13
-288,Ghana,GH,GHA,33787914,hac,,14
-450,Madagascar,MG,MDG,31195932.5,hac,,15
-36,Australia,AU,AUS,26451124,hac,,16
-466,Mali,ML,MLI,23769127.5,hac,,17
-854,Burkina Faso,BF,BFA,23025776,hac,,18
-454,Malawi,MW,MWI,21104482.5,hac,,19
-152,Chile,CL,CHL,19658835,hac,,20
-642,Romania,RO,ROU,19118478.5,hac,yes,21
-320,Guatemala,GT,GTM,18124837.5,hac,,22
-528,Netherlands,NL,NLD,18092524.5,hac,yes,23
-686,Senegal,SN,SEN,18077573.5,hac,,24
-218,Ecuador,EC,ECU,17980083,hac,,25
-324,Guinea,GN,GIN,14405468,hac,,26
-204,Benin,BJ,BEN,14111034.5,hac,,27
-646,Rwanda,RW,RWA,13954471.5,hac,,28
-56,Belgium,BE,BEL,11712893,hac,yes,29
-400,Jordan,JO,JOR,11439213.5,hac,,30
-214,Dominican Republic,DO,DOM,11331265.5,hac,,31
-784,United Arab Emirates,AE,ARE,10642081,hac,,32
-752,Sweden,SE,SWE,10551494,hac,yes,33
-620,Portugal,PT,PRT,10430738,hac,yes,34
-31,Azerbaijan,AZ,AZE,10318207,hac,,35
-768,Togo,TG,TGO,9304337.5,hac,,36
-376,Israel,IL,ISR,9256314,hac,,37
-40,Austria,AT,AUT,9130429,hac,yes,38
-756,Switzerland,CH,CHE,8870561,hac,,39
-100,Bulgaria,BG,BGR,6795803,hac,yes,40
-208,Denmark,DK,DNK,5948136.5,hac,yes,41
-246,Finland,FI,FIN,5601185.5,hac,yes,42
-578,Norway,NO,NOR,5519167,hac,,43
-372,Ireland,IE,IRL,5196630,hac,yes,44
-554,New Zealand,NZ,NZL,5172836,hac,,45
-188,Costa Rica,CR,CRI,5105525.5,hac,,46
-591,Panama,PA,PAN,4458759,hac,,47
-268,Georgia,GE,GEO,3807492,hac,,48
-858,Uruguay,UY,URY,3388080.5,hac,,49
-498,Republic of Moldova,MD,MDA,3067070,hac,,50
-51,Armenia,AM,ARM,2943393,hac,,51
-266,Gabon,GA,GAB,2484788.5,hac,,52
-705,Slovenia,SI,SVN,2118396,hac,yes,53
-233,Estonia,EE,EST,1367196,hac,yes,54
-480,Mauritius,MU,MUS,1273588,hac,,55
-242,Fiji,FJ,FJI,924145.5,hac,,56
-90,Solomon Islands,SB,SLB,800005.5,hac,,57
-442,Luxembourg,LU,LUX,665098,hac,yes,58
-499,Montenegro,ME,MNE,633552,hac,,59
-462,Maldives,MV,MDV,525994,hac,,60
-132,Cabo Verde,CV,CPV,522330.5,hac,,61
-352,Iceland,IS,ISL,387557.5,hac,,62
-548,Vanuatu,VU,VUT,320408.5,hac,,63
-52,Barbados,BB,BRB,282336,hac,,64
-678,Sao Tome and Principe,ST,STP,230871.5,hac,,65
-690,Seychelles,SC,SYC,127950.5,hac,,66
-583,Micronesia (Fed. States of),FM,FSM,112630.5,hac,,67
-28,Antigua and Barbuda,AG,ATG,93315.5,hac,,68
-304,Greenland,GL,GRL,55922.5,hac,,69
-492,Monaco,MC,MCO,38956.5,hac,,70
-585,Palau,PW,PLW,17727.5,hac,,71
-184,Cook Islands,CK,COK,14222,hac,,72
-798,Tuvalu,TV,TUV,9815.5,hac,,73
-380,Italy,IT,ITA,59499453,eu,no,74
-203,Czechia,CZ,CZE,10809716,eu,no,75
-300,Greece,GR,GRC,10242908.5,eu,no,76
-348,Hungary,HU,HUN,9686463.5,eu,no,77
-703,Slovakia,SK,SVK,5518054.5,eu,no,78
-191,Croatia,HR,HRV,3896023.5,eu,no,79
-440,Lithuania,LT,LTU,2854099,eu,no,80
-428,Latvia,LV,LVA,1882396,eu,no,81
-196,Cyprus,CY,CYP,1344975.5,eu,no,82
-470,Malta,MT,MLT,532956,eu,no,83
 900,World,1W,WLD,8091734930,,,
 902,Developing regions,DR,DGR,6807234408,,,
 1859,Low-and-middle-income countries,WB,LMC,6801234426,,,
@@ -108,6 +18,7 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 906,Eastern Asia,EA,EAA,1660028546,,,
 903,Africa,A9,AFR,1480770525,,,
 356,India,IN,IND,1438069596,,,
+156,China,CN,CHN,1422584933,lmg,,1
 901,Developed regions,RD,RDD,1284500523,,,
 1503,High-income countries,XD,HIC,1261155608,,,
 947,Sub-Saharan Africa,AH,ASS,1212229420,,,
@@ -139,6 +50,7 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 360,Indonesia,ID,IDN,281190066.5,,,
 912,Northern Africa,M2,NAF,268541105,,,
 586,Pakistan,PK,PAK,247504495.5,,,
+566,Nigeria,NG,NGA,227882945,hac,,0
 76,Brazil,BR,BRA,211140729,,,
 911,Middle Africa,AP,MIA,206129903,,,
 926,Western Europe,WU,WEU,199537113,,,
@@ -147,7 +59,10 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 2088,LLDC: Asia,DG,LLD,177104448.5,,,
 50,Bangladesh,BD,BGD,171466990,,,
 925,Southern Europe,ED,SEU,151720922,,,
+643,Russian Federation,RU,RUS,145440500.5,lmg,,4
+484,Mexico,MX,MEX,129739759,hac,,1
 231,Ethiopia,ET,ETH,128691692,,,
+392,Japan,JP,JPN,124370946.5,hac,,2
 608,Philippines,PH,PHL,114891199,,,
 818,Egypt,EG,EGY,114535771.5,,,
 5547,Group B: Central and Southern Asia,D12,DA12,114366709,,,
@@ -155,17 +70,26 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 924,Northern Europe,NB,NEU,108297394.5,,,
 180,Dem. Rep. of the Congo,CD,COD,105789731.5,,,
 704,Viet Nam,VN,VNM,100352191.5,,,
+364,Iran (Islamic Republic of),IR,IRN,90608707,lmg,,3
 792,Türkiye,TR,TUR,87270501.5,,,
+276,Germany,DE,DEU,84548231,hac,yes,3
 5500,Central Asia,CJ,CAS,80810163,,,
 961,Small island developing States (SIDS),SW,SID,72894706.5,,,
 913,Southern Africa,SF,SAF,72197701,,,
 764,Thailand,TH,THA,71702435,,,
+826,United Kingdom,GB,GBR,68682962.5,hac,,4
 834,United Republic of Tanzania,TZ,TZA,66617606.5,,,
+250,France,FR,FRA,66438822,hac,yes,5
 710,South Africa,ZA,ZAF,63212383.5,,,
 5551,"Group B: Europe, Northern America, Australia and New Zealand",D16,DA16,62110158.5,,,
+380,Italy,IT,ITA,59499453,eu,no,74
+404,Kenya,KE,KEN,55339002.5,hac,,6
 104,Myanmar,MM,MMR,54133797.5,,,
+170,Colombia,CO,COL,52321152.5,hac,,7
+410,Republic of Korea,KR,KOR,51748739,hac,,8
 729,Sudan,SD,SDN,50042790.5,,,
 800,Uganda,UG,UGA,48656601.5,,,
+724,Spain,ES,ESP,47911579.5,hac,yes,9
 12,Algeria,DZ,DZA,46164219,,,
 2091,SIDS Caribbean,DG,SID,46111811.5,,,
 909,Oceania,OA,OCE,45562787,,,
@@ -174,43 +98,78 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 915,Caribbean,CB,CAR,44249267,,,
 4,Afghanistan,AF,AFG,41454761,,,
 887,Yemen,YE,YEM,39390799,,,
+124,Canada,CA,CAN,39299104.5,hac,,10
+616,Poland,PL,POL,38762843.5,hac,yes,11
+804,Ukraine,UA,UKR,37732835.5,hac,,12
 504,Morocco,MA,MAR,37712505,,,
 24,Angola,AO,AGO,36749906,,,
 860,Uzbekistan,UZ,UZB,35652307,,,
 458,Malaysia,MY,MYS,35126298,,,
+604,Peru,PE,PER,33845617,hac,,13
+288,Ghana,GH,GHA,33787914,hac,,14
 508,Mozambique,MZ,MOZ,33635160,,,
+682,Saudi Arabia,SA,SAU,33264292,lmg,,5
+450,Madagascar,MG,MDG,31195932.5,hac,,15
 384,Côte d'Ivoire,CI,CIV,31165654,,,
 524,Nepal,NP,NPL,29694614.5,,,
 1518,No income group available,N0,NIG,28968380,,,
 120,Cameroon,CM,CMR,28372687,,,
 862,Venezuela (Bolivarian Republic of),VE,VEN,28300854,,,
+36,Australia,AU,AUS,26451124,hac,,16
 408,Dem. People's Rep. of Korea,KP,PRK,26418204,,,
 562,Niger,NE,NER,26159867,,,
+466,Mali,ML,MLI,23769127.5,hac,,17
 760,Syrian Arab Republic,SY,SYR,23594623,,,
 158,"China, Taiwan Province of China",TW,TWN,23317145,,,
+854,Burkina Faso,BF,BFA,23025776,hac,,18
 144,Sri Lanka,LK,LKA,22971617,,,
 5541,Group A: Latin America and the Caribbean,D6,DA6,21733468,,,
+454,Malawi,MW,MWI,21104482.5,hac,,19
 894,Zambia,ZM,ZMB,20723965,,,
 398,Kazakhstan,KZ,KAZ,20330104,,,
+152,Chile,CL,CHL,19658835,hac,,20
 148,Chad,TD,TCD,19319064,,,
+642,Romania,RO,ROU,19118478.5,hac,yes,21
 2090,LLDC: Latin America,DG,LLD,19088305.5,,,
 706,Somalia,SO,SOM,18358615,,,
+320,Guatemala,GT,GTM,18124837.5,hac,,22
+528,Netherlands,NL,NLD,18092524.5,hac,yes,23
+686,Senegal,SN,SEN,18077573.5,hac,,24
+218,Ecuador,EC,ECU,17980083,hac,,25
 116,Cambodia,KH,KHM,17423880.5,,,
 716,Zimbabwe,ZW,ZWE,16340821.5,,,
 2092,SIDS Pacific,DG,SID,15309345,,,
+324,Guinea,GN,GIN,14405468,hac,,26
+204,Benin,BJ,BEN,14111034.5,hac,,27
+646,Rwanda,RW,RWA,13954471.5,hac,,28
 1835,Oceania (excluding Australia and New Zealand),OZ,OCA,13938827,,,
 108,Burundi,BI,BDI,13689449.5,,,
 928,Melanesia,MB,MEL,12724064,,,
 5558,Group C: Oceania (excluding Australia and New Zealand),D23,DA23,12556934.5,,,
 68,Bolivia (Plurinational State of),BO,BOL,12244159.5,,,
 788,Tunisia,TN,TUN,12200431,,,
+56,Belgium,BE,BEL,11712893,hac,yes,29
 332,Haiti,HT,HTI,11637398.5,,,
 728,South Sudan,SS,SSD,11483374,,,
 2093,"SIDS Atlantic, Indian Ocean and South China Sea (AIS)",DG,SID,11473550,,,
+400,Jordan,JO,JOR,11439213.5,hac,,30
+214,Dominican Republic,DO,DOM,11331265.5,hac,,31
+192,Cuba,CU,CUB,11019930.5,lmg,,2
+203,Czechia,CZ,CZE,10809716,eu,no,75
 340,Honduras,HN,HND,10644851,,,
+784,United Arab Emirates,AE,ARE,10642081,hac,,32
+752,Sweden,SE,SWE,10551494,hac,yes,33
+620,Portugal,PT,PRT,10430738,hac,yes,34
 762,Tajikistan,TJ,TJK,10389798.5,,,
 598,Papua New Guinea,PG,PNG,10389635,,,
+31,Azerbaijan,AZ,AZE,10318207,hac,,35
+300,Greece,GR,GRC,10242908.5,eu,no,76
+348,Hungary,HU,HUN,9686463.5,eu,no,77
+768,Togo,TG,TGO,9304337.5,hac,,36
+376,Israel,IL,ISR,9256314,hac,,37
+40,Austria,AT,AUT,9130429,hac,yes,38
 112,Belarus,BY,BLR,9115680,,,
+756,Switzerland,CH,CHE,8870561,hac,,39
 694,Sierra Leone,SL,SLE,8460512,,,
 418,Lao People's Dem. Republic,LA,LAO,7664992.5,,,
 344,"China, Hong Kong SAR",HK,HKG,7442734.5,,,
@@ -219,70 +178,106 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 417,Kyrgyzstan,KG,KGZ,7073515.5,,,
 600,Paraguay,PY,PRY,6844146,,,
 558,Nicaragua,NI,NIC,6823613,,,
+100,Bulgaria,BG,BGR,6795803,hac,yes,40
 688,Serbia,RS,SRB,6773201,,,
 5538,Group A: Northern Africa and Western Asia,D4,DA4,6750885,,,
 222,El Salvador,SV,SLV,6309624,,,
 178,Congo,CG,COG,6182885,,,
+208,Denmark,DK,DNK,5948136.5,hac,yes,41
 702,Singapore,SG,SGP,5789089.5,,,
 422,Lebanon,LB,LBN,5773492.5,,,
+246,Finland,FI,FIN,5601185.5,hac,yes,42
+578,Norway,NO,NOR,5519167,hac,,43
+703,Slovakia,SK,SVK,5518054.5,eu,no,78
 430,Liberia,LR,LBR,5493031,,,
 275,State of Palestine,PS,PSE,5409201.5,,,
+372,Ireland,IE,IRL,5196630,hac,yes,44
+554,New Zealand,NZ,NZL,5172836,hac,,45
 140,Central African Republic,CF,CAF,5152420.5,,,
+188,Costa Rica,CR,CRI,5105525.5,hac,,46
 512,Oman,OM,OMN,5049269,,,
 478,Mauritania,MR,MRT,5022441.5,,,
 2089,LLDC: Europe,DG,LLD,4898871.5,,,
 414,Kuwait,KW,KWT,4838781.5,,,
+591,Panama,PA,PAN,4458759,hac,,47
+191,Croatia,HR,HRV,3896023.5,eu,no,79
+268,Georgia,GE,GEO,3807492,hac,,48
 232,Eritrea,ER,ERI,3470389.5,,,
 496,Mongolia,MN,MNG,3431932.5,,,
+858,Uruguay,UY,URY,3388080.5,hac,,49
 630,Puerto Rico,PR,PRI,3242022.5,,,
 70,Bosnia and Herzegovina,BA,BIH,3185073,,,
+498,Republic of Moldova,MD,MDA,3067070,hac,,50
 634,Qatar,QA,QAT,2979082,,,
 516,Namibia,NA,NAM,2963095,,,
+51,Armenia,AM,ARM,2943393,hac,,51
+440,Lithuania,LT,LTU,2854099,eu,no,80
 388,Jamaica,JM,JAM,2839786,,,
 8,Albania,AL,ALB,2811655,,,
 270,Gambia,GM,GMB,2697845.5,,,
+266,Gabon,GA,GAB,2484788.5,hac,,52
 72,Botswana,BW,BWA,2480244.5,,,
 426,Lesotho,LS,LSO,2311472,,,
 624,Guinea-Bissau,GW,GNB,2153339,,,
+705,Slovenia,SI,SVN,2118396,hac,yes,53
+428,Latvia,LV,LVA,1882396,eu,no,81
 226,Equatorial Guinea,GQ,GNQ,1847549,,,
 807,North Macedonia,MK,MKD,1831801.5,,,
 412,Kosovo (under UNSC res. 1244),XK,XKX,1700030.5,,,
+48,Bahrain,BH,BHR,1569665.5,lmg,,0
 5545,Group B: Sub-Saharan Africa,D10,DA10,1525164,,,
 780,Trinidad and Tobago,TT,TTO,1502932.5,,,
 626,Timor-Leste,TL,TLS,1384286,,,
+233,Estonia,EE,EST,1367196,hac,yes,54
+196,Cyprus,CY,CYP,1344975.5,eu,no,82
 5537,Group A: Sub-Saharan Africa,D3,DA3,1278876.5,,,
+480,Mauritius,MU,MUS,1273588,hac,,55
 748,Eswatini,SZ,SWZ,1230506,,,
 5550,Group B: Oceania (excluding Australia and New Zealand),D15,DA15,1205264,,,
 262,Djibouti,DJ,DJI,1152943.5,,,
+242,Fiji,FJ,FJI,924145.5,hac,,56
 638,Réunion,RE,REU,874883,,,
 174,Comoros,KM,COM,850387,,,
 328,Guyana,GY,GUY,826353,,,
+90,Solomon Islands,SB,SLB,800005.5,hac,,57
 64,Bhutan,BT,BTN,786385,,,
 446,"China, Macao SAR",MO,MAC,713911.5,,,
 957,Polynesia,PO,PLY,689523,,,
+442,Luxembourg,LU,LUX,665098,hac,yes,58
+499,Montenegro,ME,MNE,633552,hac,,59
 740,Suriname,SR,SUR,628886,,,
 732,Western Sahara,EH,ESH,579729,,,
+470,Malta,MT,MLT,532956,eu,no,83
+462,Maldives,MV,MDV,525994,hac,,60
 954,Micronesia,MJ,MCN,525240,,,
+132,Cabo Verde,CV,CPV,522330.5,hac,,61
 96,Brunei Darussalam,BN,BRN,458948.5,,,
 84,Belize,BZ,BLZ,411105.5,,,
 44,Bahamas,BS,BHS,399440.5,,,
+352,Iceland,IS,ISL,387557.5,hac,,62
 312,Guadeloupe,GP,GLP,376516.5,,,
 474,Martinique,MQ,MTQ,346001.5,,,
+548,Vanuatu,VU,VUT,320408.5,hac,,63
 175,Mayotte,YT,MYT,316015.5,,,
 254,French Guiana,GF,GUF,303402,,,
 540,New Caledonia,NC,NCL,289869.5,,,
+52,Barbados,BB,BRB,282336,hac,,64
 258,French Polynesia,PF,PYF,281118.5,,,
+678,Sao Tome and Principe,ST,STP,230871.5,hac,,65
 882,Samoa,WS,WSM,216663,,,
 531,Curaçao,CW,CUW,185427,,,
 662,Saint Lucia,LC,LCA,179284.5,,,
 5542,Group A: Oceania (excluding Australia and New Zealand),D7,DA7,176628.5,,,
 316,Guam,GU,GUM,166506.5,,,
 296,Kiribati,KI,KIR,132530.5,,,
+690,Seychelles,SC,SYC,127950.5,hac,,66
 308,Grenada,GD,GRD,117081,,,
+583,Micronesia (Fed. States of),FM,FSM,112630.5,hac,,67
 533,Aruba,AW,ABW,107938.5,,,
 776,Tonga,TO,TON,104597.5,,,
 832,Jersey,JE,JEY,103674.5,,,
 670,Saint Vincent and the Grenadines,VC,VCT,101322.5,,,
+28,Antigua and Barbuda,AG,ATG,93315.5,hac,,68
 850,United States Virgin Islands,VI,VIR,85701,,,
 833,Isle of Man,IM,IMN,84165.5,,,
 20,Andorra,AD,AND,80856,,,
@@ -290,6 +285,7 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 212,Dominica,DM,DMA,66510.5,,,
 60,Bermuda,BM,BMU,64698,,,
 831,Guernsey,GG,GGY,64017,,,
+304,Greenland,GL,GRL,55922.5,hac,,69
 234,Faroe Islands,FO,FRO,54713.5,,,
 16,American Samoa,AS,ASM,47521,,,
 659,Saint Kitts and Nevis,KN,KNA,46758,,,
@@ -298,15 +294,19 @@ LocationId,Location,Iso2,Iso3,Value,Affiliation,euExplicit,affId
 534,Sint Maarten (Dutch part),SX,SXM,42749,,,
 438,Liechtenstein,LI,LIE,39598,,,
 92,British Virgin Islands,VG,VGB,38985,,,
+492,Monaco,MC,MCO,38956.5,hac,,70
 584,Marshall Islands,MH,MHL,38827,,,
 292,Gibraltar,GI,GIB,38470.5,,,
 674,San Marino,SM,SMR,33732.5,,,
 535,"Bonaire, Sint Eustatius and Saba",BQ,BES,29898.5,,,
 663,Saint Martin (French part),MF,MAF,27514.5,,,
+585,Palau,PW,PLW,17727.5,hac,,71
 660,Anguilla,AI,AIA,14410,,,
+184,Cook Islands,CK,COK,14222,hac,,72
 520,Nauru,NR,NRU,11875,,,
 876,Wallis and Futuna Islands,WF,WLF,11370.5,,,
 652,Saint Barthélemy,BL,BLM,11085,,,
+798,Tuvalu,TV,TUV,9815.5,hac,,73
 666,Saint Pierre and Miquelon,PM,SPM,5681.5,,,
 654,Saint Helena,SH,SHN,5288.5,,,
 500,Montserrat,MS,MSR,4420.5,,,

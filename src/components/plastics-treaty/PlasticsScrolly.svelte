@@ -416,8 +416,8 @@
 			<Scrolly bind:value={step}>
 				{#each chapters as { chapter }, i}
 					{@const active = step === i}
-					<div class="step text-outline" class:active>
-						<p>{chapter}</p>
+					<div class="step" class:active>
+						<p>{@html chapter}</p>
 					</div>
 				{/each}
 			</Scrolly>
@@ -432,11 +432,12 @@
 
 	#country-group {
 		stroke: white;
+		stroke-width: 0.7px;
 	}
 
 	#static-countries {
 		stroke: white;
-		fill: "whitesmoke";
+		fill: whitesmoke;
 	}
 
 	#country-group path {
@@ -481,15 +482,21 @@
 		background: whitesmoke;
 		color: #ccc;
 		border-radius: 5px;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
 		transition: background 500ms ease;
 		box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
 		text-align: left;
 		width: 75%;
 		margin: auto;
 		max-width: 500px;
+		/*display: flex;
+		flex-direction: column;
+		justify-content: center;*/
+	}
+
+	.step p :global(span) {
+		background-color: orange;
+		padding: 0.1em 0.3em;
+		border-radius: 4px;
 	}
 
 	.step.active p {
