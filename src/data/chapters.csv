@@ -1,23 +1,19 @@
 type,chapter,progress1,progress2
 text,"There are two major groups of countries that have each banded together in the UN Plastics Treaty negotiations, who want almost opposite things.",0,0
-text,"The first is the <span>High Ambition Coalition (HAC)</span>, a group of 74 countries plus the European Union, that wants a strong plastics treaty. 
-This would include a cap on plastic production, elimination of certain chemicals known to harm human health and the environment, and other things. 
-
-",0,0
-text,"These countries haven't individually signed onto the HAC. But because they're part of the European Union, and the EU votes as a bloc, they're implicitly aligned with the HAC.",0,0
-text,"The second is called the Like-Minded Group (LMG). This group is opposed to a plastic production cap and stricter plastic chemical regulations. 
-Exactly what countries make up the LMG is unclear. According to C&EN reporting, the list of countries in the LMG has only appeared in a meeting paper from INC 3 in Nairobi, Kenya. Those 6 countries are shown here. 
-But the document listing these countries also says there are other countries in the group that may be shared at a later date. 
-The LMG has yet to disclose these potential other countries.
+text,"<p>The first is the <span style=""background-color: orange; color: white"">High Ambition Coalition (HAC)</span>, a group of 74 countries plus the European Union, that wants a strong plastics treaty.</p>
+<p>This would include a cap on plastic production, elimination of certain chemicals known to harm human health and the environment, and other things.</p>",0,0
+text,"These <span style=""background-color: #c78100; color: white"">ten European countries</span> haven't individually signed onto the HAC. But because they're part of the European Union, and the EU votes as a bloc, they're implicitly aligned with the HAC.",0,0
+text,"<p>The second is called the <span style=""background-color: green; color: white"">Like-Minded Group (LMG)</span>. This group is opposed to a plastic production cap and stricter plastic chemical regulations.</p>
+<p>Exactly what countries make up the LMG is unclear. According to C&EN reporting, the list of countries in the LMG has only appeared in a meeting paper from INC 3 in Nairobi, Kenya. Those 6 countries are shown here.</p>
+<p>But the document listing these countries also says there are other countries in the group that may be shared at a later date.</p>
+<p>The LMG has yet to disclose these potential other countries.</p>
 ",0,0
 text,"If we count the number of countries in each group, the HAC has a clear majority.",1,0
 text,"But if we look at population figures for each country, we get a different story...",1,1
-text,"In UN treaties, each country only gets one vote, regardless of the population. 
-Because plastic is a commodity item, worth around $524.5 billion USD in 2024, this treaty doesn’t just have high environmental stakes, it also has vast economic ones.
-In terms of population, the LMG is not in the minority. And being mostly petrostates, the LMG has high economic power.
-So the issue is more complicated than just a majority rule.
-",1,1
-text,"However, some think that there is untapped potential for compromise that we haven’t yet explored in plastics treaty negotiations. 
-We need to get away from two groups shouting at each other, and move toward two communities understanding each other, UN expert Maria Ivanova says. 
-Only then will negotiators walk away with a finished treaty.
-",1,1
+text,"<p>In UN treaties, each country only gets one vote, regardless of the population.</p>
+<p>Because plastic is a commodity item, worth around $524.5 billion USD in 2024, this treaty doesn’t just have high environmental stakes, it also has vast economic ones.</p>
+<p>In terms of population, the LMG is not in the minority. And being mostly petrostates, the LMG has high economic power.</p>
+<p>So the issue is more complicated than just a majority rule.</p>",1,1
+text,"<p>However, some think that there is untapped potential for compromise that we haven’t yet explored in plastics treaty negotiations.</p>
+<p>We need to get away from two groups shouting at each other, and move toward two communities understanding each other, UN expert Maria Ivanova says.</p>
+<p>Only then will negotiators walk away with a finished treaty.</p>",1,1

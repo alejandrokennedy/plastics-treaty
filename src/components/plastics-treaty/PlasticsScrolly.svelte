@@ -140,17 +140,20 @@
 	// 	geoWinkel3().rotate([-10.2, 0]).fitSize([width, height], geojson)
 	// );
 
-	let leftSpace = $derived(width < 768 ? 0 : Math.min(width * 0.15, 150)); // No space on mobile
-	let rightMapTrim = $derived((width + leftSpace) * 0.07);
+	let leftSpace = $derived(width < 768 ? 0 : Math.min(width * 0.1, 170)); // No space on mobile
+	let leftMapTrim = $derived(leftSpace ? 0 : width * 0.13);
+	let rightMapTrim = $derived(width * 0.075);
 
 	// $inspect("leftSpace", leftSpace);
+	// $inspect("leftMapTrim", leftMapTrim);
 
 	let projection = $derived(
 		geoWinkel3()
 			.rotate([-10.2, 0])
 			.fitExtent(
 				[
-					[leftSpace, 0],
+					[leftSpace - leftMapTrim, 0],
+					// [leftSpace, 0],
 					[width + rightMapTrim, height]
 					// [0, 0],
 					// [width, height]
@@ -170,7 +173,8 @@
 	);
 
 	// scales setup
-	const maxXWidth = $derived(Math.max(Math.min(500, width * 0.7), 230));
+	const maxXWidth = $derived(Math.max(Math.min(700, width * 0.7), 230));
+	$inspect("maxXWidth", maxXWidth);
 	const margin = $derived({
 		top: 20,
 		left: width / 2 - maxXWidth / 2 + leftSpace,
@@ -181,7 +185,8 @@
 		scaleBand()
 			.domain(["hac", "lmg"])
 			.range([margin.left, width - margin.right])
-			.paddingInner(0.03)
+			// .paddingInner(0.03)
+			.paddingInner(0.1)
 			.paddingOuter(1.5)
 	);
 	let yMax = $derived(
@@ -448,7 +453,6 @@
 		position: sticky;
 		top: calc(65px + 56px);
 		border: 2px solid orangered;
-		/*height: 100vh;*/
 		height: calc(100vh - calc(65px + 56px) - 70px);
 		z-index: 1;
 	}
@@ -461,47 +465,50 @@
 	.steps-container {
 		position: relative;
 		z-index: 2;
-		/*opacity: 0.6;*/
 		min-width: 15rem;
 		width: 30vw;
-		max-width: 50rem;
+		max-width: 28rem;
+		pointer-events: none;
 	}
 
 	.step {
+		/*border: 1px solid gold;*/
 		padding-top: 20vh;
 		padding-bottom: 60vh;
-		/*border: 1px solid gold;*/
 		text-align: center;
 		position: relative; /* needed? */
+		margin: 0 auto;
 	}
 
 	.step p {
+		/*border: 1px solid aqua;*/
 		padding: 1rem;
 		background: var(--color-gray-100);
 		font-size: 1rem;
 		background: whitesmoke;
-		color: #ccc;
+		color: #aaa;
+		opacity: 0.4;
 		border-radius: 5px;
-		transition: background 500ms ease;
+		transition:
+			background 300ms ease,
+			opacity 300ms ease;
 		box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
 		text-align: left;
 		width: 75%;
 		margin: auto;
 		max-width: 500px;
-		/*display: flex;
-		flex-direction: column;
-		justify-content: center;*/
 	}
 
 	.step p :global(span) {
-		background-color: orange;
 		padding: 0.1em 0.3em;
 		border-radius: 4px;
+		color: white;
 	}
 
 	.step.active p {
 		background: white;
 		color: black;
+		opacity: 0.94;
 	}
 
 	@media screen and (max-width: 768px) {
@@ -516,6 +523,7 @@
 
 		.steps-container {
 			width: 100%;
+			max-width: 50rem;
 		}
 	}
 </style>
