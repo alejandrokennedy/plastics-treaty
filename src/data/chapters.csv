@@ -1,13 +1,12 @@
 type,chapter,progress1,progress2
 text,"There are two major groups of countries that have each banded together in the UN Plastics Treaty negotiations, who want almost opposite things.",0,0
-text,"<p>The first is the <span style=""background-color: orange; color: white"">High Ambition Coalition (HAC)</span>, a group of 74 countries plus the European Union, that wants a strong plastics treaty.</p>
+text,"<p>The first is the <span style=""background: rgba(255, 165, 0, 0.15); color: darkorange;"">High Ambition Coalition (HAC)</span>, a group of 74 countries plus the European Union, that wants a strong plastics treaty.</p>
 <p>This would include a cap on plastic production, elimination of certain chemicals known to harm human health and the environment, and other things.</p>",0,0
-text,"These <span style=""background-color: #c78100; color: white"">ten European countries</span> haven't individually signed onto the HAC. But because they're part of the European Union, and the EU votes as a bloc, they're implicitly aligned with the HAC.",0,0
-text,"<p>The second is called the <span style=""background-color: green; color: white"">Like-Minded Group (LMG)</span>. This group is opposed to a plastic production cap and stricter plastic chemical regulations.</p>
+text,"These <span style=""background: rgba(184, 92, 0, 0.15); color: rgb(184, 92, 0);"">ten European countries</span> haven't individually signed onto the HAC. But because they're part of the European Union, and the EU votes as a bloc, they're implicitly aligned with the HAC.",0,0
+text,"<p>The second is called the <span style=""background: rgba(0, 128, 0, 0.15); color: darkgreen;"">Like-Minded Group (LMG)</span>. This group is opposed to a plastic production cap and stricter plastic chemical regulations.</p>
 <p>Exactly what countries make up the LMG is unclear. According to C&EN reporting, the list of countries in the LMG has only appeared in a meeting paper from INC 3 in Nairobi, Kenya. Those 6 countries are shown here.</p>
 <p>But the document listing these countries also says there are other countries in the group that may be shared at a later date.</p>
-<p>The LMG has yet to disclose these potential other countries.</p>
-",0,0
+<p>The LMG has yet to disclose these potential other countries.</p>",0,0
 text,"If we count the number of countries in each group, the HAC has a clear majority.",1,0
 text,"But if we look at population figures for each country, we get a different story...",1,1
 text,"<p>In UN treaties, each country only gets one vote, regardless of the population.</p>

@@ -12,6 +12,7 @@
 		color as d3color
 	} from "d3";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
+	import Tooltip from "$components/figure/Tooltip.svelte";
 	import { getContext, onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import { Tween } from "svelte/motion";
@@ -87,6 +88,12 @@
 	let step = $state(null);
 	let width = $state(600);
 	let height = $state(400);
+
+	// Tooltip state
+	let showTooltip = $state(false);
+	let tooltipX = $state(0);
+	let tooltipY = $state(0);
+	let hoveredCountry = $state(null);
 
 	const tweenConfig = {
 		duration: 800,
@@ -266,7 +273,8 @@
 		rawStaticCountries.map((c) => ({
 			id: c.id,
 			path: pathGenerator(c),
-			Location: c.Location || ""
+			Location: c.Location || "",
+			Value: c.Value || null
 		}))
 	);
 
@@ -386,6 +394,19 @@
 			return "whitesmoke";
 		})
 	);
+
+	// Tooltip handlers
+	function handleCountryHover(event: MouseEvent, country: any) {
+		tooltipX = event.clientX;
+		tooltipY = event.clientY;
+		hoveredCountry = country;
+		showTooltip = true;
+	}
+
+	function handleCountryLeave() {
+		showTooltip = false;
+		hoveredCountry = null;
+	}
 </script>
 
 {#if chapters.length > 0}
@@ -394,27 +415,102 @@
 			<svg id="svg" {width} {height}>
 				{#if step < 4 && step != null}
 					<g transition:fade id="static-countries">
-						{#each staticCountries as { path, Location }}
-							<path d={path} fill="whitesmoke">
-								{#if Location}
-									<title>{Location}</title>
-								{/if}
-							</path>
+						{#each staticCountries as country}
+							{#if hoveredCountry?.id !== country.id}
+								<path
+									d={country.path}
+									fill="whitesmoke"
+									onmousemove={(e) => handleCountryHover(e, country)}
+									onmouseleave={handleCountryLeave}
+									role="img"
+									aria-label={country.Location || "Country"}
+								>
+								</path>
+							{/if}
 						{/each}
 					</g>
 				{/if}
 				{#if step != null}
 					<g transition:fade id="country-group">
-						{#each countries as { Location }, i}
-							<path d={currentPaths[i]} fill={countryFills[i]}>
-								{#if Location}
-									<title>{Location}</title>
-								{/if}
-							</path>
+						{#each countries as country, i}
+							{#if hoveredCountry?.id !== country.id}
+								<path
+									d={currentPaths[i]}
+									fill={countryFills[i]}
+									onmousemove={(e) => handleCountryHover(e, country)}
+									onmouseleave={handleCountryLeave}
+									role="img"
+									aria-label={country.Location || "Country"}
+								>
+								</path>
+							{/if}
 						{/each}
 					</g>
 				{/if}
+
+				<!-- THIRD PASS: Render hovered country on top of EVERYTHING -->
+				{#if showTooltip && hoveredCountry}
+					<g id="hovered-country">
+						<!-- Check if hovered country is static -->
+						{#if step < 4 && step != null}
+							{#each staticCountries as country}
+								{#if hoveredCountry?.id === country.id}
+									<path
+										d={country.path}
+										fill="whitesmoke"
+										class="hovered"
+										onmousemove={(e) => handleCountryHover(e, country)}
+										onmouseleave={handleCountryLeave}
+										role="img"
+										aria-label={country.Location || "Country"}
+									>
+									</path>
+								{/if}
+							{/each}
+						{/if}
+						<!-- Check if hovered country is dynamic -->
+						{#if step != null}
+							{#each countries as country, i}
+								{#if hoveredCountry?.id === country.id}
+									<path
+										d={currentPaths[i]}
+										fill={countryFills[i]}
+										class="hovered"
+										onmousemove={(e) => handleCountryHover(e, country)}
+										onmouseleave={handleCountryLeave}
+										role="img"
+										aria-label={country.Location || "Country"}
+									>
+									</path>
+								{/if}
+							{/each}
+						{/if}
+					</g>
+				{/if}
 			</svg>
+
+			<!-- Tooltip -->
+			{#if showTooltip && hoveredCountry}
+				<Tooltip x={tooltipX} y={tooltipY} offset={12}>
+					{#snippet children()}
+						<div class="country-tooltip">
+							<strong>{hoveredCountry.Location}</strong>
+							{#if hoveredCountry.Value}
+								<p class="population">
+									Pop: {(hoveredCountry.Value / 1_000_000).toFixed(1)}M
+								</p>
+							{/if}
+							{#if hoveredCountry.affiliation}
+								<p class="affiliation {hoveredCountry.affiliation}">
+									{hoveredCountry.affiliation === "eu"
+										? "HAC (EU)"
+										: hoveredCountry.affiliation.toUpperCase()}
+								</p>
+							{/if}
+						</div>
+					{/snippet}
+				</Tooltip>
+			{/if}
 		</div>
 		<div class="spacer"></div>
 		<div class="steps-container">
@@ -446,7 +542,28 @@
 	}
 
 	#country-group path {
-		transition: fill 0.16s ease-in-out;
+		/*transition: fill 0.16s ease-in-out;*/
+		transition:
+			fill 0.16s ease-in-out,
+			stroke 0.15s ease-in-out,
+			stroke-width 0.15s ease-in-out,
+			opacity 0.15s ease-in-out;
+	}
+
+	#hovered-country path {
+		stroke: #555;
+		/*stroke: white;*/
+		stroke-width: 1.5px;
+		opacity: 1;
+		filter: brightness(1.05);
+		paint-order: stroke fill;
+	}
+
+	#static-countries path {
+		transition:
+			stroke 0.15s ease-in-out,
+			stroke-width 0.15s ease-in-out,
+			opacity 0.15s ease-in-out;
 	}
 
 	#viz-container {
@@ -465,7 +582,6 @@
 	.steps-container {
 		position: relative;
 		z-index: 2;
-		min-width: 15rem;
 		width: 30vw;
 		max-width: 28rem;
 		pointer-events: none;
@@ -500,9 +616,10 @@
 	}
 
 	.step p :global(span) {
-		padding: 0.1em 0.3em;
-		border-radius: 4px;
-		color: white;
+		padding: 0.1rem 0.4rem;
+		border-radius: 3px;
+		font-weight: 600;
+		letter-spacing: 0.5px;
 	}
 
 	.step.active p {
@@ -512,18 +629,64 @@
 	}
 
 	@media screen and (max-width: 768px) {
-		/*.section-container {
-			flex-direction: column-reverse;
-		}*/
-
-		/*#viz-container {
-			width: 95%;
-			margin: auto;
-		}*/
-
 		.steps-container {
 			width: 100%;
 			max-width: 50rem;
 		}
+	}
+
+	/* Tooltip styles */
+	.country-tooltip {
+		background: white;
+		padding: 0.45rem 0.75rem;
+		border-radius: 6px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		font-size: 0.875rem;
+		/*min-width: 140px;*/
+		max-width: 250px;
+	}
+
+	.country-tooltip strong {
+		display: block;
+		color: #333;
+		margin-bottom: 0.2rem;
+		font-size: 0.9rem;
+		line-height: 1.3;
+	}
+
+	.country-tooltip p {
+		margin: 0.25rem 0;
+		color: #666;
+		font-size: 0.77rem;
+	}
+
+	.country-tooltip .population {
+		color: #555;
+		font-weight: 500;
+	}
+
+	.country-tooltip .affiliation {
+		display: inline-block;
+		padding: 0.2rem 0.5rem;
+		border-radius: 3px;
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.5px;
+		margin-top: 0.25rem;
+	}
+
+	.country-tooltip .affiliation.hac {
+		background: rgba(255, 165, 0, 0.15);
+		color: darkorange;
+	}
+
+	.country-tooltip .affiliation.eu {
+		background: rgba(184, 92, 0, 0.15);
+		color: rgb(184, 92, 0);
+	}
+
+	.country-tooltip .affiliation.lmg {
+		background: rgba(0, 128, 0, 0.15);
+		color: darkgreen;
 	}
 </style>
