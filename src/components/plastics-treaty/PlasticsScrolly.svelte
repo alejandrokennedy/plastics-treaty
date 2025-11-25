@@ -85,6 +85,8 @@
 			(d.affId = +d.affId));
 	});
 
+	const countryIndex = index(countryData, (d) => d.LocationId);
+
 	let step = $state(null);
 	let width = $state(600);
 	let height = $state(400);
@@ -104,7 +106,6 @@
 	const progress2 = new Tween(0, tweenConfig);
 
 	// Multi-resolution compositing: combine features from all three resolutions
-	// Start with 110m (smallest file), then add missing from 50m, then 10m
 	const geoOneTen = feature(worldOneTen, worldOneTen.objects.countries);
 	const geoFifty = feature(worldFifty, worldFifty.objects.countries);
 	const geoTen = feature(worldTen, worldTen.objects.countries);
@@ -116,61 +117,50 @@
 		});
 	});
 
-	// Create index of existing IDs from 110m resolution
+	// Filter geoOneTen to exclude Antarctica (ID: 10) and countries not in our data
+	geoOneTen.features = geoOneTen.features.filter(
+		(f) => f.id !== 10 && countryIndex.has(f.id)
+	);
+
+	// Create index of existing IDs from filtered 110m resolution
 	const existingIds = new Set(geoOneTen.features.map((f) => f.id));
 
-	// Add missing features from 50m resolution
+	// Add missing features from 50m resolution (only if they're in our data)
 	geoFifty.features.forEach((feature) => {
-		if (!existingIds.has(feature.id)) {
+		if (!existingIds.has(feature.id) && countryIndex.has(feature.id)) {
 			geoOneTen.features.push(feature);
 			existingIds.add(feature.id);
 		}
 	});
 
-	// Add missing features from 10m resolution
+	// Add missing features from 10m resolution (only if they're in our data)
 	geoTen.features.forEach((feature) => {
-		if (!existingIds.has(feature.id)) {
+		if (!existingIds.has(feature.id) && countryIndex.has(feature.id)) {
 			geoOneTen.features.push(feature);
 			existingIds.add(feature.id);
 		}
 	});
 
 	const processedGeo = geoOneTen;
-	// console.log(
-	// 	`Total countries after compositing: ${processedGeo.features.length}`
-	// );
-	// console.log("processedGeo", processedGeo);
 
 	let geojson = $state(processedGeo);
-
-	// let projection = $derived(
-	// 	geoWinkel3().rotate([-10.2, 0]).fitSize([width, height], geojson)
-	// );
 
 	let leftSpace = $derived(width < 768 ? 0 : Math.min(width * 0.1, 170)); // No space on mobile
 	let leftMapTrim = $derived(leftSpace ? 0 : width * 0.13);
 	let rightMapTrim = $derived(width * 0.075);
-
-	// $inspect("leftSpace", leftSpace);
-	// $inspect("leftMapTrim", leftMapTrim);
-
 	let projection = $derived(
 		geoWinkel3()
 			.rotate([-10.2, 0])
 			.fitExtent(
 				[
 					[leftSpace - leftMapTrim, 0],
-					// [leftSpace, 0],
 					[width + rightMapTrim, height]
-					// [0, 0],
-					// [width, height]
 				],
 				geojson
 			)
 	);
 
 	let pathGenerator = $derived(geoPath(projection));
-	let countryIndex = $derived(index(countryData, (d) => d.LocationId));
 	let affiliationRollup = $derived(
 		rollup(
 			countryData,
@@ -181,18 +171,16 @@
 
 	// scales setup
 	const maxXWidth = $derived(Math.max(Math.min(700, width * 0.7), 230));
-	$inspect("maxXWidth", maxXWidth);
 	const margin = $derived({
-		top: 20,
+		top: 30,
 		left: width / 2 - maxXWidth / 2 + leftSpace,
-		bottom: 20,
+		bottom: 10,
 		right: width / 2 - maxXWidth / 2
 	});
 	let xScale = $derived(
 		scaleBand()
 			.domain(["hac", "lmg"])
 			.range([margin.left, width - margin.right])
-			// .paddingInner(0.03)
 			.paddingInner(0.1)
 			.paddingOuter(1.5)
 	);
@@ -211,7 +199,9 @@
 		(d) => d.Affiliation === "hac" || d.Affiliation === "eu"
 	);
 	const lmgGroup = countryData.filter((d) => d.Affiliation === "lmg");
-	const popDiff = sum(lmgGroup, (d) => d.Value) - sum(hacGroup, (d) => d.Value);
+	const hacPop = sum(hacGroup, (d) => d.Value);
+	const lmgPop = sum(lmgGroup, (d) => d.Value);
+	const popDiff = lmgPop - hacPop;
 
 	const makeStack = (data, val, name, buffer = 0) => {
 		const total = sum(data, (d) => d[val]) + buffer;
@@ -231,6 +221,14 @@
 	const hacStack = makeStack(hacGroup, "Value", "LocationId", popDiff);
 	const lmgStack = makeStack(lmgGroup, "Value", "LocationId");
 	const stack = new Map([...hacStack, ...lmgStack]);
+
+	// Calculate the top position of each stack (maximum endValue in each group)
+	const hacStackTop = Math.max(
+		...Array.from(hacStack.values()).map((d) => d.endValue)
+	);
+	const lmgStackTop = Math.max(
+		...Array.from(lmgStack.values()).map((d) => d.endValue)
+	);
 
 	const yStackScale = $derived(
 		scaleLinear()
@@ -395,6 +393,23 @@
 		})
 	);
 
+	// Show unit labels only when on step 4, unit chart is showing, and both transitions have completed
+	const showUnitLabels = $derived(
+		step === 4 &&
+			progress1.current > 0 &&
+			Math.abs(progress1.current - progress1.target) < 0.01 &&
+			Math.abs(progress2.current - progress2.target) < 0.01 &&
+			progress2.current < 1
+	);
+
+	// Show stack labels only when on step 5 and both transitions have completed
+	const showStackLabels = $derived(
+		step === 5 &&
+			Math.abs(progress1.current - progress1.target) < 0.01 &&
+			Math.abs(progress2.current - progress2.target) < 0.01 &&
+			progress2.current > 0
+	);
+
 	// Tooltip handlers
 	function handleCountryHover(event: MouseEvent, country: any) {
 		tooltipX = event.clientX;
@@ -445,6 +460,57 @@
 								</path>
 							{/if}
 						{/each}
+					</g>
+				{/if}
+
+				{#if showUnitLabels && step === 4}
+					<g id="stack-labels" transition:fade>
+						<!-- HAC stack label -->
+						<text
+							x={xScale("hac") + xScale.bandwidth() / 2}
+							y={margin.top - 10}
+							text-anchor="middle"
+							class="stack-label"
+							fill={color("hac")}
+						>
+							{hacGroup.length}
+						</text>
+						<!-- LMG stack label -->
+						<text
+							x={xScale("lmg") + xScale.bandwidth() / 2}
+							y={yScale(6)}
+							text-anchor="middle"
+							class="stack-label"
+							fill={color("lmg")}
+						>
+							{lmgGroup.length}
+						</text>
+					</g>
+				{/if}
+
+				<!-- Stack labels when on step 5 -->
+				{#if showStackLabels}
+					<g id="stack-labels" transition:fade>
+						<!-- HAC stack label -->
+						<text
+							x={xScale("hac") - 5}
+							y={yStackScale(hacStackTop)}
+							text-anchor="end"
+							class="stack-label"
+							fill={color("hac")}
+						>
+							{(hacPop / 1_000_000_000).toFixed(2)}B
+						</text>
+						<!-- LMG stack label -->
+						<text
+							x={xScale("lmg") + xScale.bandwidth() + 5}
+							y={yStackScale(lmgStackTop)}
+							text-anchor="start"
+							class="stack-label"
+							fill={color("lmg")}
+						>
+							{(lmgPop / 1_000_000_000).toFixed(2)}B
+						</text>
 					</g>
 				{/if}
 

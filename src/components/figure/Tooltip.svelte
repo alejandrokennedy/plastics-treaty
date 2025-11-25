@@ -58,5 +58,10 @@
 	}
 	.tooltip-box {
 		position: fixed;
+		/* IMPORTANT: Disable all transitions to prevent lag */
+		transition: none !important;
+		/* Ensure position properties update instantly */
+		transform: translateZ(0); /* Force GPU acceleration */
+		will-change: auto; /* Don't hint for optimization */
 	}
 </style>
