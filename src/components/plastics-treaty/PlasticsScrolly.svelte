@@ -465,21 +465,21 @@
 
 				{#if showUnitLabels && step === 4}
 					<g id="stack-labels" transition:fade>
-						<!-- HAC stack label -->
+						<!-- HAC unit label -->
 						<text
-							x={xScale("hac") + xScale.bandwidth() / 2}
-							y={margin.top - 10}
-							text-anchor="middle"
+							x={xScale("hac") - 5}
+							y={yScale(hacGroup.length - 1)}
+							text-anchor="end"
 							class="stack-label"
 							fill={color("hac")}
 						>
 							{hacGroup.length}
 						</text>
-						<!-- LMG stack label -->
+						<!-- LMG unit label -->
 						<text
-							x={xScale("lmg") + xScale.bandwidth() / 2}
-							y={yScale(6)}
-							text-anchor="middle"
+							x={xScale("lmg") + xScale.bandwidth() + 5}
+							y={yScale(lmgGroup.length - 1)}
+							text-anchor="start"
 							class="stack-label"
 							fill={color("lmg")}
 						>
