@@ -1,0 +1,113 @@
+/**
+ * Test configuration using :where()-wrapped scoped files
+ * Separates "must win" container styles from "easily overridden" descendant styles
+ */
+
+@import "variables.css";
+@import "font.css";
+
+/* Font variables that are missing from variables.css */
+:root {
+	/* Font families */
+	--sans:
+		"Inter", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+	--serif: Georgia, "Times New Roman", Times, serif;
+	--mono: "Roboto Mono", Menlo, Consolas, Monaco, monospace;
+
+	/* Font presets */
+	--font-body: var(--serif);
+	--font-form: var(--sans);
+
+	/* Other presets from app.css */
+	--border-radius: 2px;
+	--color-primary: var(--color-black);
+	--color-link: var(--color-black);
+	--color-link-hover: var(--color-black);
+	--color-focus: var(--color-red);
+	--color-mark: var(--color-yellow);
+	--color-selection: var(--color-gray-300);
+	--color-border: var(--color-gray-300);
+	--color-button-bg: var(--color-gray-300);
+	--color-button-fg: var(--color-gray-900);
+	--color-button-hover: var(--color-gray-400);
+	--color-input-bg: var(--color-gray-50);
+	--color-input-fg: var(--color-gray-900);
+	--color-placeholder: var(--color-gray-500);
+
+	/* z-index */
+	--z-bottom: -100;
+	--z-middle: 0;
+	--z-top: 100;
+	--z-overlay: 1000;
+
+	/* Animation duration */
+	--1s: 1ms;
+}
+
+/* Variable font support */
+@supports (font-variation-settings: normal) {
+	:root {
+		--sans:
+			"InterVariable", -apple-system, BlinkMacSystemFont, Helvetica, Arial,
+			sans-serif;
+	}
+}
+
+/* Reduced motion preference */
+@media screen and (prefers-reduced-motion: no-preference) {
+	:root {
+		--1s: 1s;
+	}
+}
+
+/* ===================================================================
+   CONTAINER STYLES - Need specificity to establish inheritance
+   =================================================================== */
+
+/* These styles MUST win to establish proper inheritance */
+#plastics-treaty {
+	background-color: var(--color-bg, white);
+	color: var(--color-fg, black);
+	line-height: 1.4;
+	font-family: var(--font-body, Georgia, "Times New Roman", Times, serif);
+	font-feature-settings:
+		"kern" 1,
+		"onum" 0,
+		"liga" 0,
+		"tnum" 1;
+	text-rendering: optimizeLegibility;
+	word-wrap: break-word;
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* ===================================================================
+   DESCENDANT STYLES - Use :where() for zero specificity
+   =================================================================== */
+
+@import "normalize-scoped.css";
+@import "reset-scoped.css";
+
+/* Body margin reset */
+:where(body) {
+	margin: 0;
+}
+
+/* Additional scoped heading sizes for #plastics-treaty descendants */
+:where(#plastics-treaty) h1 {
+	font-size: var(--48px, 48px);
+}
+:where(#plastics-treaty) h2 {
+	font-size: var(--36px, 36px);
+}
+:where(#plastics-treaty) h3 {
+	font-size: var(--28px, 28px);
+}
+:where(#plastics-treaty) h4 {
+	font-size: var(--24px, 24px);
+}
+:where(#plastics-treaty) h5 {
+	font-size: var(--22px, 22px);
+}
+:where(#plastics-treaty) h6 {
+	font-size: var(--20px, 20px);
+}
