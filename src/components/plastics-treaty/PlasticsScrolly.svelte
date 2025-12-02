@@ -377,6 +377,7 @@
 
 			let interpol1 = null;
 			let interpol2 = null;
+			let interpol3 = null;
 			// Validate all rectangle parameters before creating interpolator
 			const x = xScale(affiliation) || xScale("hac");
 			const y = yScale(affId);
@@ -437,6 +438,7 @@
 				affiliation,
 				interpol1,
 				interpol2,
+				interpol3,
 				Location: d?.Location
 			};
 		}) ?? []
@@ -530,6 +532,41 @@
 	});
 
 	$inspect("docBatches", docBatches);
+
+	// TEST: Create interpol3 for first HAC batch only
+	const testInterpol3 = $derived.by(() => {
+		if (!docBatches.length || !browser) return null;
+
+		// Find first HAC batch
+		const firstHacBatch = docBatches.find((b) => b.affiliation === "hac");
+		if (!firstHacBatch) return null;
+
+		const { segment, sourcePaths } = firstHacBatch;
+
+		// Create target rectangle
+		const x = xDocScale(segment.startValue);
+		const y = yDocScale(segment.ln);
+		const width = xDocScale(segment.endValue) - xDocScale(segment.startValue);
+		const height = yDocScale.bandwidth();
+		const targetRect = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
+
+		console.log("First HAC batch has", sourcePaths.length, "source paths");
+		console.log("Target rect:", targetRect);
+
+		// Create interpolator
+		try {
+			const interpolator = flubber.combine(sourcePaths, targetRect, {
+				single: true
+			});
+			console.log("✓ Successfully created test interpolator!");
+			return { interpolator, targetRect, sourcePaths };
+		} catch (error) {
+			console.error("✗ Failed to create test interpolator:", error);
+			return null;
+		}
+	});
+
+	$inspect("testInterpol3", testInterpol3);
 	// Update tween targets based on step
 	$effect(() => {
 		const chapter = chapters[step];
@@ -539,13 +576,14 @@
 		}
 	});
 
+	// updated to reflect new text
 	const currentPaths = $derived.by(() => {
-		if (step === null || step === undefined || step < 3) {
+		if (step === null || step === undefined || step < 4) {
 			return countries.map((c) => c.path1);
 		}
-		if (step >= 5) return paths2;
-		if (step === 4) return progress2.current > 0 ? paths2 : paths1;
-		if (step === 3) return paths1;
+		if (step >= 6) return paths2;
+		if (step === 5) return progress2.current > 0 ? paths2 : paths1;
+		if (step === 4) return paths1;
 		return countries.map((c) => c.path1);
 	});
 
@@ -558,18 +596,19 @@
 		})
 	);
 
-	// Show unit labels only when on step 4, unit chart is showing, and both transitions have completed
+	// Show unit labels only when on step 5, unit chart is showing, and both transitions have completed
 	const showUnitLabels = $derived(
-		step === 4 &&
+		// step === 5
+		step === 5 &&
 			progress1.current > 0 &&
 			Math.abs(progress1.current - progress1.target) < 0.01 &&
 			Math.abs(progress2.current - progress2.target) < 0.01 &&
 			progress2.current < 1
 	);
 
-	// Show stack labels only when on step 5 and both transitions have completed
+	// Show stack labels only when on step 6 and both transitions have completed
 	const showStackLabels = $derived(
-		step === 5 &&
+		step === 6 &&
 			Math.abs(progress1.current - progress1.target) < 0.01 &&
 			Math.abs(progress2.current - progress2.target) < 0.01 &&
 			progress2.current > 0
@@ -628,7 +667,7 @@
 					</g>
 				{/if}
 
-				{#if showUnitLabels && step === 4}
+				{#if showUnitLabels}
 					<g id="stack-labels" transition:fade>
 						<!-- HAC unit label -->
 						<text
