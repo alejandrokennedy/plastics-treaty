@@ -1,0 +1,112 @@
+/**
+ * Scoped CSS for PlasticsTreaty Component
+ *
+ * Contains only the necessary resets and variables for the PlasticsTreaty
+ * component to render correctly when embedded.
+ */
+
+/* Body margin reset */
+:where(body) {
+	margin: 0;
+}
+
+/* Essential resets scoped to plastics-treaty (zero specificity via :where) */
+:where(#plastics-treaty),
+:where(#plastics-treaty *),
+:where(#plastics-treaty *::before),
+:where(#plastics-treaty *::after) {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	vertical-align: baseline;
+}
+
+/* Container-level inherited styles */
+#plastics-treaty {
+	color: var(--color-fg, #000000);
+	line-height: 1.4;
+	font-family: var(--font-body, Georgia, "Times New Roman", Times, serif);
+	font-feature-settings:
+		"kern" 1,
+		"onum" 0,
+		"liga" 0,
+		"tnum" 1;
+	text-rendering: optimizeLegibility;
+	word-wrap: break-word;
+	-webkit-tap-highlight-color: transparent;
+
+	/* Color variables */
+	--color-black: #000000;
+	--color-white: #ffffff;
+	--color-gray-50: rgb(247, 247, 247);
+	--color-gray-100: rgb(239, 239, 239);
+	--color-gray-200: rgb(223, 223, 223);
+	--color-gray-300: rgb(202, 202, 202);
+	--color-gray-400: rgb(168, 168, 168);
+	--color-gray-500: rgb(135, 135, 135);
+	--color-gray-600: rgb(109, 109, 109);
+	--color-gray-700: rgb(78, 78, 78);
+	--color-gray-800: rgb(55, 55, 55);
+	--color-gray-900: rgb(38, 38, 38);
+	--color-gray-1000: rgb(25, 25, 25);
+
+	/* Category colors for visualizations */
+	--category-blue: #4477aa;
+	--category-red: #ee6677;
+	--category-green: #228833;
+	--category-yellow: #ccbb44;
+	--category-cyan: #66ccee;
+	--category-purple: #aa3377;
+	--category-gray: #bbbbbb;
+
+	/* Font families */
+	--sans:
+		"Inter", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+	--serif: Georgia, "Times New Roman", Times, serif;
+	--mono: "Roboto Mono", Menlo, Consolas, Monaco, monospace;
+	--font-body: var(--serif);
+
+	/* Base colors */
+	--color-bg: var(--color-white);
+	--color-fg: var(--color-gray-900);
+
+	/* Typography scale */
+	--12px: 0.75rem;
+	--14px: 0.875rem;
+	--16px: 1rem;
+	--18px: 1.125rem;
+	--20px: 1.25rem;
+	--22px: 1.375rem;
+	--24px: 1.5rem;
+	--28px: 1.75rem;
+	--32px: 2rem;
+	--36px: 2.25rem;
+	--40px: 2.5rem;
+	--44px: 2.75rem;
+	--48px: 3rem;
+	--56px: 3.5rem;
+	--64px: 4rem;
+	--80px: 5rem;
+	--96px: 6rem;
+	--112px: 7rem;
+	--128px: 8rem;
+
+	/* Animation duration */
+	--1s: 1ms;
+}
+
+/* Variable font support for modern browsers */
+@supports (font-variation-settings: normal) {
+	#plastics-treaty {
+		--sans:
+			"InterVariable", -apple-system, BlinkMacSystemFont, Helvetica, Arial,
+			sans-serif;
+	}
+}
+
+/* Enable smooth animations for users who haven't disabled them */
+@media screen and (prefers-reduced-motion: no-preference) {
+	#plastics-treaty {
+		--1s: 1s;
+	}
+}
