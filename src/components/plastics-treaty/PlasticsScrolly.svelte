@@ -9,6 +9,8 @@
 		range,
 		csv,
 		sum,
+		randomInt,
+		randomNormal,
 		color as d3color
 	} from "d3";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
@@ -243,6 +245,76 @@
 	const color = scaleOrdinal()
 		.domain(["hac", "lmg", "eu"])
 		.range([hacColor, lmgColor, euColor]);
+
+	// DocChart
+	const numLines = 12;
+	const lines = Array.from({ length: numLines }, (_, i) => i);
+	const minSeg = 2;
+	const maxSeg = 5;
+	const randSegNum = randomInt(minSeg, maxSeg);
+
+	const maxDocWidth = $derived(Math.max(Math.min(700, width * 0.4), 230));
+	const docMargin = $derived({
+		top: 40,
+		left: width / 2 - maxDocWidth / 2 + leftSpace,
+		bottom: 40,
+		right: width / 2 - maxDocWidth / 2
+	});
+
+	const xDocScale = $derived(
+		scaleLinear()
+			.domain([0, 1])
+			.range([docMargin.left, docMargin.left + maxDocWidth])
+	);
+
+	const yDocScale = $derived(
+		scaleBand()
+			.domain(lines)
+			.range([docMargin.top, height - docMargin.bottom])
+			.paddingInner(0.4)
+	);
+
+	const docData = [];
+
+	const makeLineStack = (data, gapSize = 0.02) => {
+		const numSegments = data.length;
+		const totalGapSpace = (numSegments - 1) * gapSize; // gaps between segments
+		const availableSpace = 1 - totalGapSpace; // remaining space for actual segments
+
+		const total = sum(data, (d) => d.val);
+		let value = 0;
+		let cumulativeGap = 0; // track how much gap we've added so far
+
+		return data.map((d, i) => {
+			const normalizedValue = (d.val / total) * availableSpace; // scale to available space
+			const startValue = (value / total) * availableSpace + cumulativeGap;
+			value += d.val;
+			const endValue = (value / total) * availableSpace + cumulativeGap;
+
+			cumulativeGap += i < numSegments - 1 ? gapSize : 0; // add gap after each segment except last
+
+			return {
+				...d,
+				value: normalizedValue,
+				startValue,
+				endValue
+			};
+		});
+	};
+
+	lines.forEach((ln) => {
+		console.log("---");
+		const segments = Array.from({ length: randSegNum() }, (_, i) => ({
+			id: i,
+			ln,
+			name: Math.random() < 0.5 ? "hac" : "lmg",
+			val: Math.max(Math.random(), 0.2)
+		}));
+		console.log("segments", segments);
+		const stack = makeLineStack(segments);
+		console.log("stack", stack);
+		stack.forEach((segment) => docData.push(segment));
+	});
 
 	// Split countries into static (no data) and dynamic (with data)
 	const { rawStaticCountries, rawCountries } = $derived.by(() => {
@@ -551,6 +623,34 @@
 								{/if}
 							{/each}
 						{/if}
+					</g>
+				{/if}
+
+				{#if step === 7 || step === 0}
+					<g id="document" transition:fade>
+						<!-- Border -->
+						<!-- <rect
+							x={docMargin.left}
+							y={docMargin.top}
+							width={maxDocWidth}
+							height={height - docMargin.top - docMargin.bottom}
+							fill="none"
+							stroke="gray"
+							stroke-width="2"
+						/> -->
+
+						<!-- Segments -->
+						{#each docData as segment}
+							<rect
+								x={xDocScale(segment.startValue)}
+								y={yDocScale(segment.ln)}
+								width={xDocScale(segment.endValue) -
+									xDocScale(segment.startValue)}
+								height={yDocScale.bandwidth()}
+								fill={segment.name === "hac" ? hacColor : lmgColor}
+								opacity="0.7"
+							/>
+						{/each}
 					</g>
 				{/if}
 			</svg>
