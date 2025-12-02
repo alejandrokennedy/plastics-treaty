@@ -598,7 +598,6 @@
 
 	// Show unit labels only when on step 5, unit chart is showing, and both transitions have completed
 	const showUnitLabels = $derived(
-		// step === 5
 		step === 5 &&
 			progress1.current > 0 &&
 			Math.abs(progress1.current - progress1.target) < 0.01 &&
@@ -632,7 +631,7 @@
 	<section id="plastics-scrolly">
 		<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
 			<svg id="svg" {width} {height}>
-				{#if step < 4 && step != null}
+				{#if step < 5 && step != null}
 					<g transition:fade id="static-countries">
 						{#each staticCountries as country}
 							{#if hoveredCountry?.id !== country.id}
@@ -667,7 +666,7 @@
 					</g>
 				{/if}
 
-				{#if showUnitLabels}
+				{#if showUnitLabels && step === 5}
 					<g id="stack-labels" transition:fade>
 						<!-- HAC unit label -->
 						<text
@@ -722,7 +721,7 @@
 				{#if showTooltip && hoveredCountry}
 					<g id="hovered-country">
 						<!-- Check if hovered country is static -->
-						{#if step < 4 && step != null}
+						{#if step < 5 && step != null}
 							{#each staticCountries as country}
 								{#if hoveredCountry?.id === country.id}
 									<path
