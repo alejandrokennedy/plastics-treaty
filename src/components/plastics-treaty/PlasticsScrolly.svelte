@@ -10,7 +10,7 @@
 		csv,
 		sum,
 		randomInt,
-		randomNormal,
+		shuffle,
 		color as d3color
 	} from "d3";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
@@ -302,19 +302,37 @@
 		});
 	};
 
-	lines.forEach((ln) => {
-		console.log("---");
+	// First pass: create all segments without affiliation
+	lines.forEach((ln, lineIndex) => {
 		const segments = Array.from({ length: randSegNum() }, (_, i) => ({
-			id: i,
+			id: `${lineIndex}-${i}`, // Unique ID
 			ln,
-			name: Math.random() < 0.5 ? "hac" : "lmg",
 			val: Math.max(Math.random(), 0.2)
 		}));
-		console.log("segments", segments);
 		const stack = makeLineStack(segments);
-		console.log("stack", stack);
 		stack.forEach((segment) => docData.push(segment));
 	});
+
+	// Second pass: create balanced affiliation array and shuffle
+	const totalSegments = docData.length;
+	const numHac = Math.floor(totalSegments / 2);
+	const numLmg = totalSegments - numHac; // handles odd numbers
+
+	// Create array with half HAC, half LMG
+	const affiliations = [
+		...Array(numHac).fill("hac"),
+		...Array(numLmg).fill("lmg")
+	];
+
+	// Shuffle using D3's shuffle
+	const shuffledAffiliations = shuffle(affiliations);
+
+	// Assign shuffled affiliations to segments
+	docData.forEach((segment, i) => {
+		segment.name = shuffledAffiliations[i];
+	});
+
+	console.log("Total segments:", totalSegments, "HAC:", numHac, "LMG:", numLmg);
 
 	// Split countries into static (no data) and dynamic (with data)
 	const { rawStaticCountries, rawCountries } = $derived.by(() => {
@@ -437,6 +455,81 @@
 		return interpolators2.map((fn) => (fn ? fn(p) : null));
 	});
 
+	// Batch countries for document transition
+	const docBatches = $derived.by(() => {
+		if (!docData.length || !countries.length) return [];
+
+		// Separate HAC and LMG segments
+		const hacSegments = docData.filter((d) => d.name === "hac");
+		const lmgSegments = docData.filter((d) => d.name === "lmg");
+
+		// Get countries by affiliation (from paths2, which are the stacked bar states)
+		const hacCountries = countries
+			.map((c, i) => ({ country: c, index: i }))
+			.filter(
+				({ country }) =>
+					country.affiliation === "hac" || country.affiliation === "eu"
+			);
+		const lmgCountries = countries
+			.map((c, i) => ({ country: c, index: i }))
+			.filter(({ country }) => country.affiliation === "lmg");
+
+		console.log(
+			"HAC countries:",
+			hacCountries.length,
+			"HAC segments:",
+			hacSegments.length
+		);
+		console.log(
+			"LMG countries:",
+			lmgCountries.length,
+			"LMG segments:",
+			lmgSegments.length
+		);
+
+		// Batch HAC countries
+		const countriesPerHacSegment = Math.ceil(
+			hacCountries.length / hacSegments.length
+		);
+		const hacBatches = hacSegments.map((segment, i) => {
+			const startIdx = i * countriesPerHacSegment;
+			const batch = hacCountries.slice(
+				startIdx,
+				startIdx + countriesPerHacSegment
+			);
+			return {
+				segment,
+				sourcePaths: batch
+					.map(({ index }) => paths2[index])
+					.filter((p) => p != null),
+				sourceIndices: batch.map(({ index }) => index),
+				affiliation: "hac"
+			};
+		});
+
+		// Distribute LMG countries across LMG segments
+		// Each segment gets one source country (some countries will be reused)
+		const lmgBatches = lmgSegments.map((segment, i) => {
+			// Cycle through LMG countries
+			const countryIdx = i % lmgCountries.length;
+			const { index } = lmgCountries[countryIdx];
+			return {
+				segment,
+				sourcePaths: paths2[index] ? [paths2[index]] : [],
+				sourceIndices: [index],
+				affiliation: "lmg"
+			};
+		});
+
+		console.log("HAC batches created:", hacBatches.length);
+		console.log("LMG batches created:", lmgBatches.length);
+		console.log("Sample HAC batch:", hacBatches[0]);
+		console.log("Sample LMG batch:", lmgBatches[0]);
+
+		return [...hacBatches, ...lmgBatches];
+	});
+
+	$inspect("docBatches", docBatches);
 	// Update tween targets based on step
 	$effect(() => {
 		const chapter = chapters[step];
@@ -625,7 +718,6 @@
 						{/if}
 					</g>
 				{/if}
-
 				{#if step === 7 || step === 0}
 					<g id="document" transition:fade>
 						<!-- Border -->
@@ -640,7 +732,7 @@
 						/> -->
 
 						<!-- Segments -->
-						{#each docData as segment}
+						<!-- {#each docData as segment}
 							<rect
 								x={xDocScale(segment.startValue)}
 								y={yDocScale(segment.ln)}
@@ -650,7 +742,7 @@
 								fill={segment.name === "hac" ? hacColor : lmgColor}
 								opacity="0.7"
 							/>
-						{/each}
+						{/each} -->
 					</g>
 				{/if}
 			</svg>
