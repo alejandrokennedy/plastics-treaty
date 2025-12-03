@@ -390,6 +390,9 @@
 			const height2 =
 				yStackScale(stack.get(c.id).startValue) -
 				yStackScale(stack.get(c.id).endValue);
+
+			const stackRectPath = `M${x2},${y2}L${x2 + width2},${y2}L${x2 + width2},${y2 + height2}L${x2},${y2 + height2}Z`;
+
 			// Create the target rectangle as an SVG path string
 			const rectPath = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
 
@@ -436,6 +439,7 @@
 				...c,
 				path1,
 				affiliation,
+				stackRectPath,
 				interpol1,
 				interpol2,
 				interpol3,
@@ -443,19 +447,6 @@
 			};
 		}) ?? []
 	);
-
-	const interpolators1 = $derived(countries.map((d) => d.interpol1));
-	const interpolators2 = $derived(countries.map((d) => d.interpol2));
-
-	const paths1 = $derived.by(() => {
-		const p = progress1.current;
-		return interpolators1.map((fn) => (fn ? fn(p) : null));
-	});
-
-	const paths2 = $derived.by(() => {
-		const p = progress2.current;
-		return interpolators2.map((fn) => (fn ? fn(p) : null));
-	});
 
 	// Batch countries for document transition
 	const docBatches = $derived.by(() => {
@@ -502,7 +493,7 @@
 			return {
 				segment,
 				sourcePaths: batch
-					.map(({ index }) => paths2[index])
+					.map(({ country }) => country.stackRectPath)
 					.filter((p) => p != null),
 				sourceIndices: batch.map(({ index }) => index),
 				affiliation: "hac"
@@ -514,10 +505,10 @@
 		const lmgBatches = lmgSegments.map((segment, i) => {
 			// Cycle through LMG countries
 			const countryIdx = i % lmgCountries.length;
-			const { index } = lmgCountries[countryIdx];
+			const { country, index } = lmgCountries[countryIdx];
 			return {
 				segment,
-				sourcePaths: paths2[index] ? [paths2[index]] : [],
+				sourcePaths: country.stackRectPath ? [country.stackRectPath] : [],
 				sourceIndices: [index],
 				affiliation: "lmg"
 			};
@@ -567,6 +558,24 @@
 	});
 
 	$inspect("testInterpol3", testInterpol3);
+
+	const interpolators3 = $derived.by(() => {
+		if (!docBatches.length || !browser) return null;
+	});
+
+	const interpolators1 = $derived(countries.map((d) => d.interpol1));
+	const interpolators2 = $derived(countries.map((d) => d.interpol2));
+
+	const paths1 = $derived.by(() => {
+		const p = progress1.current;
+		return interpolators1.map((fn) => (fn ? fn(p) : null));
+	});
+
+	const paths2 = $derived.by(() => {
+		const p = progress2.current;
+		return interpolators2.map((fn) => (fn ? fn(p) : null));
+	});
+
 	// Update tween targets based on step
 	$effect(() => {
 		const chapter = chapters[step];
