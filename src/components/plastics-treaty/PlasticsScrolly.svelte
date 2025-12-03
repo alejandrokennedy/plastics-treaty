@@ -80,6 +80,80 @@
 
 	// $inspect("chapters", chapters);
 
+	let barVisible = $state(false);
+
+	onMount(() => {
+		console.log("🔍 onMount: Setting up MutationObserver for bar detection...");
+
+		let closeButton = null;
+		let listenerAttached = false;
+		let userClosed = false;
+		let observer = null;
+
+		const handleClose = () => {
+			console.log("🖱️ Close button clicked!");
+			userClosed = true;
+			barVisible = false;
+			console.log("✅ Bar closed - barVisible set to false");
+		};
+
+		// Check for bar and attach listener
+		const checkForBar = () => {
+			const container = document.querySelector("#cen-main-metered-bar");
+			const bar = document.querySelector("#article-meter");
+			const newCloseButton = document.querySelector(
+				"#article-meter .btn-close"
+			);
+
+			// Update barVisible state if bar appears (but not if user manually closed it)
+			if (container && bar && !barVisible && !userClosed) {
+				barVisible = true;
+				console.log("✅ Bar appeared! Setting barVisible to true");
+
+				// Once bar is detected, stop observing (we don't need to watch anymore)
+				if (observer) {
+					observer.disconnect();
+					console.log("🔍 Bar detected - disconnecting observer");
+				}
+			}
+
+			// Attach click listener if button found and not yet attached
+			if (newCloseButton && !listenerAttached) {
+				closeButton = newCloseButton;
+				closeButton.addEventListener("click", handleClose);
+				listenerAttached = true;
+				console.log("✅ Click listener attached to close button");
+			}
+		};
+
+		// Initial check (in case bar already exists)
+		checkForBar();
+
+		// Watch for when the bar appears in the DOM
+		observer = new MutationObserver(() => {
+			checkForBar();
+		});
+
+		// Start observing the entire document for changes
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true
+		});
+
+		console.log("🔍 MutationObserver started - watching for bar...");
+
+		// Cleanup when component unmounts
+		return () => {
+			console.log("🧹 Cleanup: Disconnecting observer and removing listener");
+			if (observer) {
+				observer.disconnect();
+			}
+			if (closeButton && listenerAttached) {
+				closeButton.removeEventListener("click", handleClose);
+			}
+		};
+	});
+
 	countryData.forEach((d) => {
 		((d.LocationId = +d.LocationId),
 			(d.Value = +d.Value),
@@ -655,7 +729,12 @@
 
 {#if chapters.length > 0}
 	<section id="plastics-scrolly">
-		<div id="viz-container" bind:clientWidth={width} bind:clientHeight={height}>
+		<div
+			id="viz-container"
+			bind:clientWidth={width}
+			bind:clientHeight={height}
+			style="height: calc(100vh - 65px - {barVisible ? 54.6 : 0}px);"
+		>
 			<svg id="svg" {width} {height}>
 				{#if step < 5 && step != null}
 					<g transition:fade id="static-countries">
@@ -886,9 +965,9 @@
 
 	#viz-container {
 		position: sticky;
-		top: calc(65px + 56px);
+		/*top: calc(65px + 56px);*/
+		top: 65px;
 		border: 2px solid orangered;
-		height: calc(100vh - calc(65px + 56px) - 70px);
 		z-index: 1;
 	}
 
