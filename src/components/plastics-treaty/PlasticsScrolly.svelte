@@ -57,10 +57,9 @@
 				chapters = result.map((c) => ({
 					...c,
 					progress1: c.progress1 != null ? +c.progress1 : 0,
-					progress2: c.progress2 != null ? +c.progress2 : 0
+					progress2: c.progress2 != null ? +c.progress2 : 0,
+					progress3: c.progress3 != null ? +c.progress3 : 0
 				}));
-
-				// console.log("Fetched chapters:", chapters);
 			} catch (err) {
 				if (err instanceof Error && err.name === "AbortError") {
 					return; // Component unmounted
@@ -106,6 +105,7 @@
 
 	const progress1 = new Tween(0, tweenConfig);
 	const progress2 = new Tween(0, tweenConfig);
+	const progress3 = new Tween(0, tweenConfig);
 
 	// Multi-resolution compositing: combine features from all three resolutions
 	const geoOneTen = feature(worldOneTen, worldOneTen.objects.countries);
@@ -467,29 +467,20 @@
 			.map((c, i) => ({ country: c, index: i }))
 			.filter(({ country }) => country.affiliation === "lmg");
 
-		console.log(
-			"HAC countries:",
-			hacCountries.length,
-			"HAC segments:",
-			hacSegments.length
-		);
-		console.log(
-			"LMG countries:",
-			lmgCountries.length,
-			"LMG segments:",
-			lmgSegments.length
-		);
+		// Batch HAC countries - distribute evenly across all segments
+		const baseCount = Math.floor(hacCountries.length / hacSegments.length);
+		const remainder = hacCountries.length % hacSegments.length;
 
-		// Batch HAC countries
-		const countriesPerHacSegment = Math.ceil(
-			hacCountries.length / hacSegments.length
-		);
+		let currentIndex = 0;
 		const hacBatches = hacSegments.map((segment, i) => {
-			const startIdx = i * countriesPerHacSegment;
+			// First 'remainder' segments get baseCount + 1, rest get baseCount
+			const countriesInThisSegment = i < remainder ? baseCount + 1 : baseCount;
 			const batch = hacCountries.slice(
-				startIdx,
-				startIdx + countriesPerHacSegment
+				currentIndex,
+				currentIndex + countriesInThisSegment
 			);
+			currentIndex += countriesInThisSegment;
+
 			return {
 				segment,
 				sourcePaths: batch
@@ -500,8 +491,7 @@
 			};
 		});
 
-		// Distribute LMG countries across LMG segments
-		// Each segment gets one source country (some countries will be reused)
+		// Distribute LMG countries across LMG segments - Each segment gets one source country (some countries will be reused)
 		const lmgBatches = lmgSegments.map((segment, i) => {
 			// Cycle through LMG countries
 			const countryIdx = i % lmgCountries.length;
@@ -514,53 +504,70 @@
 			};
 		});
 
-		console.log("HAC batches created:", hacBatches.length);
-		console.log("LMG batches created:", lmgBatches.length);
-		console.log("Sample HAC batch:", hacBatches[0]);
-		console.log("Sample LMG batch:", lmgBatches[0]);
-
 		return [...hacBatches, ...lmgBatches];
 	});
 
-	$inspect("docBatches", docBatches);
-
-	// TEST: Create interpol3 for first HAC batch only
-	const testInterpol3 = $derived.by(() => {
-		if (!docBatches.length || !browser) return null;
-
-		// Find first HAC batch
-		const firstHacBatch = docBatches.find((b) => b.affiliation === "hac");
-		if (!firstHacBatch) return null;
-
-		const { segment, sourcePaths } = firstHacBatch;
-
-		// Create target rectangle
-		const x = xDocScale(segment.startValue);
-		const y = yDocScale(segment.ln);
-		const width = xDocScale(segment.endValue) - xDocScale(segment.startValue);
-		const height = yDocScale.bandwidth();
-		const targetRect = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
-
-		console.log("First HAC batch has", sourcePaths.length, "source paths");
-		console.log("Target rect:", targetRect);
-
-		// Create interpolator
-		try {
-			const interpolator = flubber.combine(sourcePaths, targetRect, {
-				single: true
-			});
-			console.log("✓ Successfully created test interpolator!");
-			return { interpolator, targetRect, sourcePaths };
-		} catch (error) {
-			console.error("✗ Failed to create test interpolator:", error);
-			return null;
-		}
-	});
-
-	$inspect("testInterpol3", testInterpol3);
-
 	const interpolators3 = $derived.by(() => {
-		if (!docBatches.length || !browser) return null;
+		if (!docBatches.length || !countries.length || !browser) {
+			return countries.map(() => null);
+		}
+
+		// Create interpolator for each country based on their batch assignment
+		const result = countries.map((country, i) => {
+			const affiliation = country.affiliation;
+
+			// HAC: Find which batch this country belongs to
+			if (affiliation === "hac" || affiliation === "eu") {
+				const hacBatch = docBatches.find(
+					(batch) =>
+						batch.affiliation === "hac" && batch.sourceIndices.includes(i)
+				);
+
+				if (!hacBatch) return null;
+
+				// Create target rectangle from segment
+				const { segment } = hacBatch;
+				const x = xDocScale(segment.startValue);
+				const y = yDocScale(segment.ln);
+				const width =
+					xDocScale(segment.endValue) - xDocScale(segment.startValue);
+				const height = yDocScale.bandwidth();
+				const targetRect = `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
+
+				// Interpolate from stack bar to document segment
+				return flubber.interpolate(country.stackRectPath, targetRect);
+			}
+
+			// LMG: Find all batches for this country
+			if (affiliation === "lmg") {
+				const lmgBatches = docBatches.filter(
+					(batch) =>
+						batch.affiliation === "lmg" && batch.sourceIndices.includes(i)
+				);
+
+				if (lmgBatches.length === 0) return null;
+
+				// Create array of target rectangles
+				const targetRects = lmgBatches.map((batch) => {
+					const { segment } = batch;
+					const x = xDocScale(segment.startValue);
+					const y = yDocScale(segment.ln);
+					const width =
+						xDocScale(segment.endValue) - xDocScale(segment.startValue);
+					const height = yDocScale.bandwidth();
+					return `M${x},${y}L${x + width},${y}L${x + width},${y + height}L${x},${y + height}Z`;
+				});
+
+				// Use flubber.separate to split one path into multiple rectangles
+				return flubber.separate(country.stackRectPath, targetRects, {
+					single: true
+				});
+			}
+
+			return null;
+		});
+
+		return result;
 	});
 
 	const interpolators1 = $derived(countries.map((d) => d.interpol1));
@@ -576,12 +583,18 @@
 		return interpolators2.map((fn) => (fn ? fn(p) : null));
 	});
 
+	const paths3 = $derived.by(() => {
+		const p = progress3.current;
+		return interpolators3.map((fn) => (fn ? fn(p) : null));
+	});
+
 	// Update tween targets based on step
 	$effect(() => {
 		const chapter = chapters[step];
 		if (chapter) {
 			progress1.target = chapter.progress1;
 			progress2.target = chapter.progress2;
+			progress3.target = chapter.progress3;
 		}
 	});
 
@@ -590,7 +603,11 @@
 		if (step === null || step === undefined || step < 4) {
 			return countries.map((c) => c.path1);
 		}
-		if (step >= 6) return paths2;
+		// if (step >= 7) return paths3;
+		// if (step >= 6) return paths2;
+		if (step >= 7) return paths3;
+		if (step === 6) return progress3.current > 0 ? paths3 : paths2;
+
 		if (step === 5) return progress2.current > 0 ? paths2 : paths1;
 		if (step === 4) return paths1;
 		return countries.map((c) => c.path1);
@@ -787,7 +804,7 @@
 									xDocScale(segment.startValue)}
 								height={yDocScale.bandwidth()}
 								fill={segment.name === "hac" ? hacColor : lmgColor}
-								opacity="0.7"
+								opacity="0.2"
 							/>
 						{/each} -->
 					</g>
@@ -832,10 +849,6 @@
 {/if}
 
 <style>
-	#country-background {
-		fill: blue;
-	}
-
 	#country-group {
 		stroke: white;
 		stroke-width: 0.7px;
