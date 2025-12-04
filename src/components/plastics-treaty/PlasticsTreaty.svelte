@@ -12,5 +12,6 @@
 		width: 100%;
 		margin: 0 auto;
 		padding: 0;
+		font-size: 1.125rem; /* 18px at default browser settings (18/16 = 1.125) */
 	}
 </style>

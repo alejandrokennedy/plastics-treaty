@@ -83,18 +83,14 @@
 	let barVisible = $state(false);
 
 	onMount(() => {
-		console.log("🔍 onMount: Setting up MutationObserver for bar detection...");
-
 		let closeButton = null;
 		let listenerAttached = false;
 		let userClosed = false;
 		let observer = null;
 
 		const handleClose = () => {
-			console.log("🖱️ Close button clicked!");
 			userClosed = true;
 			barVisible = false;
-			console.log("✅ Bar closed - barVisible set to false");
 		};
 
 		// Check for bar and attach listener
@@ -108,12 +104,10 @@
 			// Update barVisible state if bar appears (but not if user manually closed it)
 			if (container && bar && !barVisible && !userClosed) {
 				barVisible = true;
-				console.log("✅ Bar appeared! Setting barVisible to true");
 
 				// Once bar is detected, stop observing (we don't need to watch anymore)
 				if (observer) {
 					observer.disconnect();
-					console.log("🔍 Bar detected - disconnecting observer");
 				}
 			}
 
@@ -122,7 +116,6 @@
 				closeButton = newCloseButton;
 				closeButton.addEventListener("click", handleClose);
 				listenerAttached = true;
-				console.log("✅ Click listener attached to close button");
 			}
 		};
 
@@ -140,11 +133,8 @@
 			subtree: true
 		});
 
-		console.log("🔍 MutationObserver started - watching for bar...");
-
 		// Cleanup when component unmounts
 		return () => {
-			console.log("🧹 Cleanup: Disconnecting observer and removing listener");
 			if (observer) {
 				observer.disconnect();
 			}
@@ -405,8 +395,6 @@
 	docData.forEach((segment, i) => {
 		segment.name = shuffledAffiliations[i];
 	});
-
-	console.log("Total segments:", totalSegments, "HAC:", numHac, "LMG:", numLmg);
 
 	// Split countries into static (no data) and dynamic (with data)
 	const { rawStaticCountries, rawCountries } = $derived.by(() => {
@@ -713,8 +701,12 @@
 			progress2.current > 0
 	);
 
+	// Show affiliation labels (HAC/LMG) on steps 5 and 6
+	const showAffiliationLabels = $derived(step === 5 || step === 6);
+
 	// Tooltip handlers
 	function handleCountryHover(event: MouseEvent, country: any) {
+		if (step === 7) return; // Don't show tooltip on document view
 		tooltipX = event.clientX;
 		tooltipY = event.clientY;
 		hoveredCountry = country;
@@ -722,6 +714,7 @@
 	}
 
 	function handleCountryLeave() {
+		if (step === 7) return; // Don't handle leave on document view
 		showTooltip = false;
 		hoveredCountry = null;
 	}
@@ -773,6 +766,18 @@
 
 				{#if showUnitLabels && step === 5}
 					<g id="stack-labels" transition:fade>
+						<!-- Y-axis label -->
+						<text
+							x={xScale("hac") - 25}
+							y={height / 2}
+							text-anchor="middle"
+							transform="rotate(-90, {xScale('hac') - 25}, {height / 2})"
+							font-size="15"
+							fill="#444"
+							class="y-label"
+						>
+							Countries per group →
+						</text>
 						<!-- HAC unit label -->
 						<text
 							x={xScale("hac") - 5}
@@ -796,9 +801,21 @@
 					</g>
 				{/if}
 
-				<!-- Stack labels when on step 5 -->
+				<!-- Stack labels when on step 6 -->
 				{#if showStackLabels}
 					<g id="stack-labels" transition:fade>
+						<!-- Y-axis label -->
+						<text
+							x={xScale("hac") - 25}
+							y={height / 2}
+							text-anchor="middle"
+							transform="rotate(-90, {xScale('hac') - 25}, {height / 2})"
+							font-size="15"
+							fill="#444"
+							class="y-label"
+						>
+							Population per group →
+						</text>
 						<!-- HAC stack label -->
 						<text
 							x={xScale("hac") - 5}
@@ -822,8 +839,36 @@
 					</g>
 				{/if}
 
+				<!-- Affiliation labels (x-axis style labels at bottom) -->
+				{#if showAffiliationLabels}
+					<g id="affiliation-labels" transition:fade>
+						<!-- HAC label -->
+						<text
+							x={xScale("hac") - 5}
+							y={height - 11}
+							text-anchor="end"
+							class="affiliation-label"
+							fill={color("hac")}
+							font-weight="bold"
+						>
+							HAC
+						</text>
+						<!-- LMG label -->
+						<text
+							x={xScale("lmg") + xScale.bandwidth() + 5}
+							y={height - 11}
+							text-anchor="start"
+							class="affiliation-label"
+							fill={color("lmg")}
+							font-weight="bold"
+						>
+							LMG
+						</text>
+					</g>
+				{/if}
+
 				<!-- THIRD PASS: Render hovered country on top of EVERYTHING -->
-				{#if showTooltip && hoveredCountry}
+				{#if showTooltip && hoveredCountry && step !== 7}
 					<g id="hovered-country">
 						<!-- Check if hovered country is static -->
 						{#if step < 5 && step != null}
@@ -891,7 +936,7 @@
 			</svg>
 
 			<!-- Tooltip -->
-			{#if showTooltip && hoveredCountry}
+			{#if showTooltip && hoveredCountry && step !== 7}
 				<Tooltip x={tooltipX} y={tooltipY} offset={12}>
 					{#snippet children()}
 						<div class="country-tooltip">
@@ -967,13 +1012,20 @@
 		position: sticky;
 		/*top: calc(65px + 56px);*/
 		top: 65px;
-		border: 2px solid orangered;
+		/*border: 2px solid orangered;*/
 		z-index: 1;
 	}
 
 	.units,
 	.stack {
 		opacity: 0.2;
+	}
+
+	.stack-label,
+	.stack-labels,
+	.y-label,
+	.affiliation-label {
+		font-family: sans-serif;
 	}
 
 	.steps-container {
@@ -997,7 +1049,7 @@
 		/*border: 1px solid aqua;*/
 		padding: 1rem;
 		background: var(--color-gray-100);
-		font-size: 1rem;
+		/*font-size: 1rem;*/
 		background: whitesmoke;
 		color: #aaa;
 		opacity: 0.4;
