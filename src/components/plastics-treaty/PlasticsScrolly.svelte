@@ -718,6 +718,13 @@
 		showTooltip = false;
 		hoveredCountry = null;
 	}
+
+	$effect(() => {
+		if (step === 7) {
+			showTooltip = false;
+			hoveredCountry = null;
+		}
+	});
 </script>
 
 {#if chapters.length > 0}
@@ -868,7 +875,8 @@
 				{/if}
 
 				<!-- THIRD PASS: Render hovered country on top of EVERYTHING -->
-				{#if showTooltip && hoveredCountry && step !== 7}
+				<!-- {#if showTooltip && hoveredCountry && step !== 7} -->
+				{#if showTooltip && hoveredCountry}
 					<g id="hovered-country">
 						<!-- Check if hovered country is static -->
 						{#if step < 5 && step != null}
@@ -918,19 +926,6 @@
 							stroke="gray"
 							stroke-width="2"
 						/> -->
-
-						<!-- Segments -->
-						<!-- {#each docData as segment}
-							<rect
-								x={xDocScale(segment.startValue)}
-								y={yDocScale(segment.ln)}
-								width={xDocScale(segment.endValue) -
-									xDocScale(segment.startValue)}
-								height={yDocScale.bandwidth()}
-								fill={segment.name === "hac" ? hacColor : lmgColor}
-								opacity="0.2"
-							/>
-						{/each} -->
 					</g>
 				{/if}
 			</svg>
