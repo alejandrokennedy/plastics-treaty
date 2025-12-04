@@ -975,6 +975,52 @@
 		opacity: 0.94;
 	}
 
+	@media (prefers-color-scheme: dark) {
+		.step p {
+			background: #1a1a1a;
+			color: #666;
+		}
+
+		.step.active p {
+			background: #2a2a2a;
+			color: #e0e0e0;
+		}
+
+		/* Add these tooltip styles: */
+		.country-tooltip {
+			background: #2a2a2a;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+		}
+
+		.country-tooltip strong {
+			color: #e0e0e0;
+		}
+
+		.country-tooltip p {
+			color: #aaa;
+		}
+
+		.country-tooltip .population {
+			color: #bbb;
+		}
+
+		/* Affiliation badges might need brighter colors */
+		.country-tooltip .affiliation.hac {
+			background: rgba(255, 165, 0, 0.25);
+			color: #ffa500;
+		}
+
+		.country-tooltip .affiliation.eu {
+			background: rgba(184, 92, 0, 0.25);
+			color: #ff8c42;
+		}
+
+		.country-tooltip .affiliation.lmg {
+			background: rgba(0, 200, 0, 0.25);
+			color: #00c800;
+		}
+	}
+
 	@media screen and (max-width: 768px) {
 		.steps-container {
 			width: 100%;
