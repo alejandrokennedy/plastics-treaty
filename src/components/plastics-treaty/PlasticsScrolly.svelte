@@ -15,15 +15,12 @@
 	} from "d3";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
 	import Tooltip from "$components/figure/Tooltip.svelte";
-	import { getContext, onMount } from "svelte";
+	import { onMount } from "svelte";
 	import { browser } from "$app/environment";
 	import { Tween } from "svelte/motion";
-	import worldOneTen from "$data/worldOneTen.json";
-	import worldFifty from "$data/worldFifty.json";
-	import worldTen from "$data/worldTen.json";
+	import worldComposit from "$data/worldComposit.json";
 	import countryData from "$data/populationAffiliation.csv";
 	import { geoWinkel3 } from "d3-geo-projection";
-	import { feature } from "topojson-client";
 	import * as flubber from "flubber";
 	import { fade } from "svelte/transition";
 
@@ -171,43 +168,7 @@
 	const progress2 = new Tween(0, tweenConfig);
 	const progress3 = new Tween(0, tweenConfig);
 
-	// Multi-resolution compositing: combine features from all three resolutions
-	const geoOneTen = feature(worldOneTen, worldOneTen.objects.countries);
-	const geoFifty = feature(worldFifty, worldFifty.objects.countries);
-	const geoTen = feature(worldTen, worldTen.objects.countries);
-
-	// Convert all IDs from strings to numbers
-	[geoOneTen, geoFifty, geoTen].forEach((geo) => {
-		geo.features.forEach((f) => {
-			f.id = +f.id;
-		});
-	});
-
-	// Filter geoOneTen to exclude Antarctica (ID: 10) and countries not in our data
-	geoOneTen.features = geoOneTen.features.filter(
-		(f) => f.id !== 10 && countryIndex.has(f.id)
-	);
-
-	// Create index of existing IDs from filtered 110m resolution
-	const existingIds = new Set(geoOneTen.features.map((f) => f.id));
-
-	// Add missing features from 50m resolution (only if they're in our data)
-	geoFifty.features.forEach((feature) => {
-		if (!existingIds.has(feature.id) && countryIndex.has(feature.id)) {
-			geoOneTen.features.push(feature);
-			existingIds.add(feature.id);
-		}
-	});
-
-	// Add missing features from 10m resolution (only if they're in our data)
-	geoTen.features.forEach((feature) => {
-		if (!existingIds.has(feature.id) && countryIndex.has(feature.id)) {
-			geoOneTen.features.push(feature);
-			existingIds.add(feature.id);
-		}
-	});
-
-	const processedGeo = geoOneTen;
+	const processedGeo = worldComposit;
 
 	let geojson = $state(processedGeo);
 
@@ -912,20 +873,6 @@
 								{/if}
 							{/each}
 						{/if}
-					</g>
-				{/if}
-				{#if step === 7 || step === 0}
-					<g id="document" transition:fade>
-						<!-- Border -->
-						<!-- <rect
-							x={docMargin.left}
-							y={docMargin.top}
-							width={maxDocWidth}
-							height={height - docMargin.top - docMargin.bottom}
-							fill="none"
-							stroke="gray"
-							stroke-width="2"
-						/> -->
 					</g>
 				{/if}
 			</svg>
