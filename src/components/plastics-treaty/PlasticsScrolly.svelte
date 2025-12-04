@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import {
 		geoPath,
 		scaleOrdinal,
@@ -622,7 +622,7 @@
 	const showAffiliationLabels = $derived(step === 5 || step === 6);
 
 	// Tooltip handlers
-	function handleCountryHover(event: MouseEvent, country: any) {
+	function handleCountryHover(event, country) {
 		if (step === 7) return; // Don't show tooltip on document view
 		tooltipX = event.clientX;
 		tooltipY = event.clientY;
@@ -643,6 +643,20 @@
 		}
 	});
 </script>
+
+<!-- <p>
+	<strong>Sources</strong>:
+	<a href="https://population.un.org/wpp/" class="chapter-link"
+		>United Nations 2024 Revision of World Population Prospects</a
+	>;
+	<a href="https://hactoendplasticpollution.org/" class="chapter-link"
+		>High Ambition Coalition website</a
+	>;
+	<a
+		href="https://resolutions.unep.org/resolutions/uploads/iran_0.pdf"
+		class="chapter-link">Iran's statement on behalf of the Like-Minded Group</a
+	> (pdf).
+</p> -->
 
 {#if chapters.length > 0}
 	<section id="plastics-scrolly">
@@ -931,7 +945,7 @@
 		z-index: 2;
 		width: 30vw;
 		max-width: 28rem;
-		pointer-events: none;
+		/*pointer-events: none;*/
 	}
 
 	.step {
@@ -1080,5 +1094,15 @@
 	.country-tooltip .affiliation.lmg {
 		background: rgba(0, 128, 0, 0.15);
 		color: darkgreen;
+	}
+
+	/* Chapter link styles */
+	:global(.chapter-link) {
+		color: rgb(4, 109, 190);
+		text-decoration: underline;
+	}
+
+	:global(.chapter-link:hover) {
+		text-decoration: none;
 	}
 </style>

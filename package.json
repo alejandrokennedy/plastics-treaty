@@ -19,6 +19,8 @@
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@sveltejs/kit": "^2.43.4",
 		"@sveltejs/vite-plugin-svelte": "^5.1.1",
+		"@types/d3": "^7.4.3",
+		"@types/flubber": "^0.4.0",
 		"archieml": "^0.5.0",
 		"autoprefixer": "^10.4.21",
 		"bits-ui": "^2.11.3",
