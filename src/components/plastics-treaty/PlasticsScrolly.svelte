@@ -7,7 +7,6 @@
 		index,
 		rollup,
 		range,
-		csv,
 		sum,
 		randomInt,
 		shuffle,
@@ -15,7 +14,7 @@
 	} from "d3";
 	import Scrolly from "$components/helpers/Scrolly.svelte";
 	import Tooltip from "$components/figure/Tooltip.svelte";
-	import { onMount } from "svelte";
+	import { onMount, getContext } from "svelte";
 	import { browser } from "$app/environment";
 	import { Tween } from "svelte/motion";
 	import worldComposit from "$data/worldComposit.json";
@@ -24,58 +23,16 @@
 	import * as flubber from "flubber";
 	import { fade } from "svelte/transition";
 
-	// const chaptersRaw = getContext("chapters");
-	// const chapters = chaptersRaw.map((c) => ({
-	// 	...c,
-	// 	progress1: c.progress1 != null ? +c.progress1 : 0,
-	// 	progress2: c.progress2 != null ? +c.progress2 : 0
-	// }));
+	const chaptersRaw = browser ? getContext("chapters") : [];
 
-	let chapters = $state([]);
-	let loading = $state(false);
-	let error = $state<string | null>(null);
-
-	const chaptersUrl =
-		"https://docs.google.com/spreadsheets/d/e/2PACX-1vRa1NZXIvX-dy8v7LuKi6witAHmbcXtyWBm2Bs6jXNdX6Z28QhiFcC1h58B_Pj0Bnd1xBltCeNCZGSw/pub?gid=0&single=true&output=csv";
-
-	onMount(() => {
-		const controller = new AbortController();
-
-		const fetchData = async (url: string) => {
-			loading = true;
-			error = null;
-
-			try {
-				const result = await csv(url, {
-					signal: controller.signal
-				});
-
-				// Process the fetched data
-				chapters = result.map((c) => ({
-					...c,
-					progress1: c.progress1 != null ? +c.progress1 : 0,
-					progress2: c.progress2 != null ? +c.progress2 : 0,
-					progress3: c.progress3 != null ? +c.progress3 : 0
-				}));
-			} catch (err) {
-				if (err instanceof Error && err.name === "AbortError") {
-					return; // Component unmounted
-				}
-				error = err instanceof Error ? err.message : "Failed to fetch data";
-				console.error(`Error fetching data:`, err);
-			} finally {
-				loading = false;
-			}
-		};
-
-		fetchData(chaptersUrl);
-
-		return () => {
-			controller.abort();
-		};
-	});
-
-	// $inspect("chapters", chapters);
+	const chapters = Array.isArray(chaptersRaw)
+		? chaptersRaw.map((c) => ({
+				...c,
+				progress1: c.progress1 != null ? +c.progress1 : 0,
+				progress2: c.progress2 != null ? +c.progress2 : 0,
+				progress3: c.progress3 != null ? +c.progress3 : 0
+			}))
+		: [];
 
 	let barVisible = $state(false);
 
@@ -446,7 +403,6 @@
 						{ single: true } // Return one combined path string
 					);
 				} catch (error) {
-					// console.warn("Failed to combine MultiPolygon");
 					console.warn(
 						`Failed to combine MultiPolygon for ${d?.Location}:`,
 						error
