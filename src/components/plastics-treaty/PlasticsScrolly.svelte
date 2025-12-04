@@ -975,7 +975,8 @@
 		opacity: 0.94;
 	}
 
-	@media (prefers-color-scheme: dark) {
+	/* .affiliation: Affiliation badges might need brighter colors */
+	/*@media (prefers-color-scheme: dark) {
 		.step p {
 			background: #1a1a1a;
 			color: #666;
@@ -986,7 +987,6 @@
 			color: #e0e0e0;
 		}
 
-		/* Add these tooltip styles: */
 		.country-tooltip {
 			background: #2a2a2a;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -1004,7 +1004,6 @@
 			color: #bbb;
 		}
 
-		/* Affiliation badges might need brighter colors */
 		.country-tooltip .affiliation.hac {
 			background: rgba(255, 165, 0, 0.25);
 			color: #ffa500;
@@ -1019,7 +1018,7 @@
 			background: rgba(0, 200, 0, 0.25);
 			color: #00c800;
 		}
-	}
+	}*/
 
 	@media screen and (max-width: 768px) {
 		.steps-container {
