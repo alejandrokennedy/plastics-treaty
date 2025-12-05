@@ -943,6 +943,7 @@
 		z-index: 2;
 		width: 30vw;
 		max-width: 28rem;
+		pointer-events: none;
 	}
 
 	.step {
@@ -968,10 +969,11 @@
 		width: 75%;
 		margin: auto;
 		max-width: 500px;
+		pointer-events: auto;
 	}
 
 	.step p :global(span) {
-		padding: 0.1rem 0.4rem;
+		padding: 0.1rem;
 		border-radius: 3px;
 		font-weight: 600;
 		letter-spacing: 0.5px;
@@ -981,8 +983,31 @@
 		background: white;
 		color: black;
 		opacity: 0.94;
+		/*}
+
+	.step.active p {*/
+		background: rgba(255, 255, 255, 0.8); /* More transparent */
+		backdrop-filter: blur(8px); /* Blur what's behind */
+		-webkit-backdrop-filter: blur(8px); /* Safari support */
+		color: black;
+
+		/* Text outline using text-shadow */
+		--stroke-width: 2px;
+		--stroke-width-n: calc(var(--stroke-width) * -1);
+		text-shadow:
+			var(--stroke-width-n) var(--stroke-width-n) 0 white,
+			0 var(--stroke-width-n) 0 white,
+			var(--stroke-width) var(--stroke-width-n) 0 white,
+			var(--stroke-width) 0 0 white,
+			var(--stroke-width) var(--stroke-width) 0 white,
+			0 var(--stroke-width) 0 white,
+			var(--stroke-width-n) var(--stroke-width) 0 white,
+			var(--stroke-width-n) 0 0 white;
 	}
 
+	.step.active p :global(span) {
+		text-shadow: none; /* Remove outline from spans with colored backgrounds */
+	}
 	/* .affiliation: Affiliation badges might need brighter colors */
 	/*@media (prefers-color-scheme: dark) {
 		.step p {
@@ -1032,6 +1057,12 @@
 		.steps-container {
 			width: 100%;
 			max-width: 50rem;
+		}
+
+		.step.active p {
+			background: rgba(255, 255, 255, 0.75); /* More transparent */
+			backdrop-filter: blur(2.5px); /* Blur what's behind */
+			-webkit-backdrop-filter: blur(2.5px); /* Safari support */
 		}
 	}
 
