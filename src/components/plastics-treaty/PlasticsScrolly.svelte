@@ -896,7 +896,6 @@
 	}
 
 	#country-group path {
-		/*transition: fill 0.16s ease-in-out;*/
 		transition:
 			fill 0.16s ease-in-out,
 			stroke 0.15s ease-in-out,
@@ -906,7 +905,6 @@
 
 	#hovered-country path {
 		stroke: #555;
-		/*stroke: white;*/
 		stroke-width: 1.5px;
 		opacity: 1;
 		filter: brightness(1.05);
@@ -921,10 +919,10 @@
 	}
 
 	#viz-container {
-		position: sticky;
+		/*border: 2px solid orangered;*/
 		/*top: calc(65px + 56px);*/
 		top: 65px;
-		/*border: 2px solid orangered;*/
+		position: sticky;
 		z-index: 1;
 	}
 
@@ -945,11 +943,9 @@
 		z-index: 2;
 		width: 30vw;
 		max-width: 28rem;
-		/*pointer-events: none;*/
 	}
 
 	.step {
-		/*border: 1px solid gold;*/
 		padding-top: 20vh;
 		padding-bottom: 60vh;
 		text-align: center;
@@ -958,10 +954,8 @@
 	}
 
 	.step p {
-		/*border: 1px solid aqua;*/
 		padding: 1rem;
 		background: var(--color-gray-100);
-		/*font-size: 1rem;*/
 		background: whitesmoke;
 		color: #aaa;
 		opacity: 0.4;
@@ -1041,14 +1035,12 @@
 		}
 	}
 
-	/* Tooltip styles */
 	.country-tooltip {
 		background: white;
 		padding: 0.45rem 0.75rem;
 		border-radius: 6px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 		font-size: 0.875rem;
-		/*min-width: 140px;*/
 		max-width: 250px;
 	}
 
@@ -1096,7 +1088,6 @@
 		color: darkgreen;
 	}
 
-	/* Chapter link styles */
 	:global(.chapter-link) {
 		color: rgb(4, 109, 190);
 		text-decoration: underline;
