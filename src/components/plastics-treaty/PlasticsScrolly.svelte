@@ -138,7 +138,7 @@
 			.fitExtent(
 				[
 					[leftSpace - leftMapTrim, 0],
-					[width + rightMapTrim, height]
+					[width + rightMapTrim, width < 768 ? width * 0.6 : height]
 				],
 				geojson
 			)
@@ -235,11 +235,15 @@
 	const maxSeg = 5;
 	const randSegNum = randomInt(minSeg, maxSeg);
 
-	const maxDocWidth = $derived(Math.max(Math.min(700, width * 0.4), 230));
+	const maxDocWidth = $derived(
+		Math.max(Math.min(550, (width - leftSpace) * 0.5), 230)
+	);
+	const aspectRatio = 1.414; // A4 ratio
+	const docHeight = $derived(maxDocWidth * aspectRatio);
 	const docMargin = $derived({
-		top: 40,
+		top: width < 768 ? 40 : (height - docHeight) / 2,
 		left: width / 2 - maxDocWidth / 2 + leftSpace,
-		bottom: 40,
+		bottom: width < 768 ? height - docHeight - 40 : (height - docHeight) / 2,
 		right: width / 2 - maxDocWidth / 2
 	});
 
@@ -1057,6 +1061,15 @@
 		.steps-container {
 			width: 100%;
 			max-width: 50rem;
+		}
+
+		.step {
+			padding-top: 35vh;
+			padding-bottom: 45vh;
+		}
+
+		.step p {
+			padding: 0.1rem 1rem;
 		}
 
 		.step.active p {
