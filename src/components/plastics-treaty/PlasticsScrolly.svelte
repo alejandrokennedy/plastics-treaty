@@ -220,8 +220,9 @@
 			.range([height - margin.bottom, margin.top])
 	);
 
-	const hacColor = "orange",
-		lmgColor = "green",
+	// const hacColor = "orange",
+	const hacColor = d3color("orange").darker(0.1).formatHex(),
+		lmgColor = d3color("green").brighter(0.4).formatHex(),
 		euColor = d3color(hacColor).darker(0.7).formatHex();
 
 	const color = scaleOrdinal()

@@ -8,7 +8,7 @@
 
 <style>
 	#plastics-treaty {
-		max-width: 100rem;
+		max-width: 125rem;
 		width: 100%;
 		margin: 0 auto;
 		padding: 0;
