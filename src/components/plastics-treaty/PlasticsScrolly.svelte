@@ -17,6 +17,7 @@
 	import { onMount, getContext } from "svelte";
 	import { browser } from "$app/environment";
 	import { Tween } from "svelte/motion";
+	import { quadInOut } from "svelte/easing";
 	import worldComposit from "$data/worldComposit.json";
 	import countryData from "$data/populationAffiliation.csv";
 	import { geoWinkel3 } from "d3-geo-projection";
@@ -117,8 +118,9 @@
 	let hoveredCountry = $state(null);
 
 	const tweenConfig = {
-		duration: 800,
-		easing: (t) => t * t * (3 - 2 * t) // Smoothstep
+		duration: 1000,
+		// easing: (t) => t * t * (3 - 2 * t) // Smoothstep
+		easing: quadInOut
 	};
 
 	const progress1 = new Tween(0, tweenConfig);
