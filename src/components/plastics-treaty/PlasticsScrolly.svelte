@@ -998,19 +998,6 @@
 		backdrop-filter: blur(8px); /* Blur what's behind */
 		-webkit-backdrop-filter: blur(8px); /* Safari support */
 		color: black;
-
-		/* Text outline using text-shadow */
-		--stroke-width: 2px;
-		--stroke-width-n: calc(var(--stroke-width) * -1);
-		text-shadow:
-			var(--stroke-width-n) var(--stroke-width-n) 0 white,
-			0 var(--stroke-width-n) 0 white,
-			var(--stroke-width) var(--stroke-width-n) 0 white,
-			var(--stroke-width) 0 0 white,
-			var(--stroke-width) var(--stroke-width) 0 white,
-			0 var(--stroke-width) 0 white,
-			var(--stroke-width-n) var(--stroke-width) 0 white,
-			var(--stroke-width-n) 0 0 white;
 	}
 
 	.step.active p :global(span) {
@@ -1083,6 +1070,19 @@
 			background: rgba(255, 255, 255, 0.75); /* More transparent */
 			backdrop-filter: blur(2.5px); /* Blur what's behind */
 			-webkit-backdrop-filter: blur(2.5px); /* Safari support */
+
+			/* Text outline using text-shadow */
+			--stroke-width: 2px;
+			--stroke-width-n: calc(var(--stroke-width) * -1);
+			text-shadow:
+				var(--stroke-width-n) var(--stroke-width-n) 0 white,
+				0 var(--stroke-width-n) 0 white,
+				var(--stroke-width) var(--stroke-width-n) 0 white,
+				var(--stroke-width) 0 0 white,
+				var(--stroke-width) var(--stroke-width) 0 white,
+				0 var(--stroke-width) 0 white,
+				var(--stroke-width-n) var(--stroke-width) 0 white,
+				var(--stroke-width-n) 0 0 white;
 		}
 	}
 
