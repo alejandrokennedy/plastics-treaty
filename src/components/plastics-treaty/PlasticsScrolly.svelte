@@ -220,7 +220,6 @@
 			.range([height - margin.bottom, margin.top])
 	);
 
-	// const hacColor = "orange",
 	const hacColor = d3color("orange").darker(0.1).formatHex(),
 		lmgColor = d3color("green").brighter(0.4).formatHex(),
 		euColor = d3color(hacColor).darker(0.7).formatHex();
@@ -876,7 +875,8 @@
 			{/if}
 		</div>
 		<div class="spacer"></div>
-		<div class="steps-container">
+		<!-- <div class="steps-container"> -->
+		<div class="steps-container" style:margin-left={step >= 5 ? "3vw" : "0vw"}>
 			<Scrolly bind:value={step}>
 				{#each chapters as { chapter }, i}
 					{@const active = step === i}
@@ -924,11 +924,10 @@
 	}
 
 	#viz-container {
-		/*border: 2px solid orangered;*/
+		border: 2px solid orangered;
 		/*top: calc(65px + 56px);*/
 		top: 65px;
 		position: sticky;
-		z-index: 1;
 	}
 
 	.units,
@@ -945,7 +944,7 @@
 
 	.steps-container {
 		position: relative;
-		z-index: 2;
+		z-index: 1;
 		width: 30vw;
 		max-width: 28rem;
 		pointer-events: none;
@@ -982,6 +981,15 @@
 		border-radius: 3px;
 		font-weight: 600;
 		letter-spacing: 0.5px;
+	}
+
+	.step p :global(p) {
+		margin-top: 0.4rem;
+		margin-bottom: 16px;
+	}
+
+	.step p :global(p:last-child) {
+		margin-bottom: 0.4rem;
 	}
 
 	.step.active p {
@@ -1071,6 +1079,7 @@
 
 		.step p {
 			padding: 0.1rem 1rem;
+			overflow: auto; /* Creates a new block formatting context */
 		}
 
 		.step.active p {
