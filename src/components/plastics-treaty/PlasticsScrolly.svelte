@@ -648,20 +648,6 @@
 	});
 </script>
 
-<!-- <p>
-	<strong>Sources</strong>:
-	<a href="https://population.un.org/wpp/" class="chapter-link"
-		>United Nations 2024 Revision of World Population Prospects</a
-	>;
-	<a href="https://hactoendplasticpollution.org/" class="chapter-link"
-		>High Ambition Coalition website</a
-	>;
-	<a
-		href="https://resolutions.unep.org/resolutions/uploads/iran_0.pdf"
-		class="chapter-link">Iran's statement on behalf of the Like-Minded Group</a
-	> (pdf).
-</p> -->
-
 {#if chapters.length > 0}
 	<section id="plastics-scrolly">
 		<div
@@ -875,12 +861,16 @@
 			{/if}
 		</div>
 		<div class="spacer"></div>
-		<!-- <div class="steps-container"> -->
-		<div class="steps-container" style:margin-left={step >= 5 ? "3vw" : "0vw"}>
+		<div class="steps-container">
 			<Scrolly bind:value={step}>
 				{#each chapters as { chapter }, i}
 					{@const active = step === i}
-					<div class="step" class:active>
+					<div
+						class="step"
+						class:active
+						style:margin-left={width < 768 ? "auto" : i >= 5 ? "7vw" : "0vw"}
+						style:max-width={width < 768 ? "100%" : i >= 5 ? "35rem" : "30rem"}
+					>
 						<p>{@html chapter}</p>
 					</div>
 				{/each}
@@ -924,7 +914,7 @@
 	}
 
 	#viz-container {
-		border: 2px solid orangered;
+		/*border: 2px solid orangered;*/
 		/*top: calc(65px + 56px);*/
 		top: 65px;
 		position: sticky;
@@ -943,14 +933,17 @@
 	}
 
 	.steps-container {
+		/*border: 2px solid blueviolet;*/
 		position: relative;
 		z-index: 1;
-		width: 30vw;
-		max-width: 28rem;
+		width: 40vw;
+		max-width: 40rem;
 		pointer-events: none;
 	}
 
 	.step {
+		/*border: 2px solid gold;*/
+		width: 30vw;
 		padding-top: 20vh;
 		padding-bottom: 60vh;
 		text-align: center;
@@ -1075,6 +1068,8 @@
 		.step {
 			padding-top: 35vh;
 			padding-bottom: 45vh;
+			width: 100%;
+			max-width: 100%;
 		}
 
 		.step p {
